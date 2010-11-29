@@ -1,10 +1,7 @@
-# Create a variable containing all .cpp files
-FILE(GLOB files *.cpp)
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-# Create an executable file from sources
-ADD_EXECUTABLE(koda_bwt ${files})
+ADD_SUBDIRECTORY(second_step)
 
-install(
-  TARGETS koda_bwt
-  RUNTIME DESTINATION bin
-)
+# Add compiler directives
+add_definitions(-Wall)
+add_definitions(-Werror=return-type)
