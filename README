@@ -1,0 +1,8 @@
+Warsaw University of Technology KODA course project. Implementation of BWT.
+
+
+Build info:
+
+mkdir build && cd build && cmake ..
+
+make
