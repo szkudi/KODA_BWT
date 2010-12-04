@@ -1,32 +1,29 @@
 /*!
- * \file MTF.h
- * \brief Implementation of BWT second step algorithm - Move To Front
+ * \file DC.h
+ * \brief Implementation of BWT second step algorithm - distance coder
  *
  *  \date 29-11-2010
  *  \author Kacper Szkudlarek
  */
 
-#ifndef MTF_H_
-#define MTF_H_
+#ifndef DC_H_
+#define DC_H_
 
 #include "SecondStepAlg.h"
 
 namespace SecondStepAlgs {
 
-/*!
- * Implementation of BWT second step algorithm - Move To Front
- */
-
-class MTF{// : public SecondStepAlg {
+class DC{//: public SecondStepAlgs::SecondStepAlg {
 public:
 	/*!
-	 * Class constructor
+	 * Constructor
 	 */
-	MTF();
+	DC();
+
 	/*!
-	 * Class destructor
+	 * Destrucotor
 	 */
-	virtual ~MTF();
+	virtual ~DC();
 
 	/*!
 	 * Method used to encode given data
@@ -37,7 +34,7 @@ public:
 	 *
 	 * \return Encoded data is returned via pointer given to method
 	 */
-	void encodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
+	void encodeBuf(const uint8_t* in_buf, unsigned int* out_buf, int buf_size);
 	/*!
 	 * Method used to decode given encoded data
 	 *
@@ -47,7 +44,20 @@ public:
 	 *
 	 * \return Decoded data is returned via pointer given to method
 	 */
-	void decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
+	void decodeBuf(const unsigned int* in_buf, uint8_t* out_buf, int buf_size);
+
+	/*!
+	 * Getter method for alphabet start positions.
+	 * \return pointer to copied data
+	 */
+	int* getStart_dst() const;
+	/*!
+	 * Setter method for alphabet start position
+	 * \param start pointer to given data
+	 */
+    void setStart_dst(const int *start);
+
+
 private:
 	/*!
 	 * Method used to generate starting alphabet
@@ -57,9 +67,11 @@ private:
 	static const int alphabet_size = 256;
 
 	///Array containing used alphabet - ASCII
-	uint8_t alphabet[alphabet_size];
+	int start_pos[alphabet_size];
+	int last_pos[alphabet_size];
+
 };
 
 }
 
-#endif /* MTF_H_ */
+#endif /* DC_H_ */

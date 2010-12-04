@@ -16,8 +16,11 @@ class SecondStepAlg{
 public:
 	virtual ~SecondStepAlg() {};
 
-	virtual void encode_buf(uint8_t* buf, int buf_size) = 0;
-	virtual void decode_buf(uint8_t* buf, int buf_size) = 0;
+	virtual void encodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size) = 0;
+	virtual void decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size) = 0;
+
+private:
+	virtual void init() = 0;
 
 
 };

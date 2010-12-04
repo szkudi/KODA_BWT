@@ -7,12 +7,14 @@
 
 #include "MTF.h"
 //#include <stdint.h>
+#include <cstring>
+#include <iostream>
 
 namespace SecondStepAlgs {
 
 using namespace std;
 
-MTF::MTF():SecondStepAlg() {
+MTF::MTF(){//:SecondStepAlg() {
 
 
 }
@@ -21,39 +23,43 @@ MTF::~MTF() {
 
 }
 
-void MTF::reset_alphabet(){
-	for(uint8_t i = 0; i < alphabet_size; ++i)
+void MTF::init(){
+	for(int i = 0; i < alphabet_size; ++i)
 		alphabet[i] = i;
 }
 
-void MTF::encode_buf(uint8_t *buf, int buf_size){
+void MTF::encodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size){
 
-	reset_alphabet();
-	uint8_t tmp;
+	init();
+//	cout << "Init" << endl;
+//	out_buf = new uint8_t[buf_size];
+//	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
+
+//	cout << "Start konwersji" << endl;
 
     for (int i = 0; i < buf_size; ++i) {
-        tmp = alphabet[buf[i]];
+        out_buf[i] = alphabet[in_buf[i]];
         for (int j = 0; j < alphabet_size; ++j)
-            if (alphabet[j] < alphabet[buf[i]])
+            if (alphabet[j] < alphabet[in_buf[i]])
                 ++alphabet[j];
-        alphabet[buf[i]] = 0;
-        buf[i] = tmp;
+        alphabet[in_buf[i]] = 0;
     }
 }
 
-void MTF::decode_buf(uint8_t *buf, int buf_size){
+void MTF::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size){
 
-    uint8_t tmp, buf_tmp;
+    uint8_t tmp;
+//	out_buf = new uint8_t[buf_size];
+//	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
 
-    reset_alphabet();
+    init();
 
     for (int i = 0; i < buf_size; ++i) {
-        buf_tmp = alphabet[buf[i]];
-        tmp = alphabet[buf[i]];
-        for (int j = buf[i]; j ; --j)
+        out_buf[i] = alphabet[in_buf[i]];
+        tmp = alphabet[in_buf[i]];
+        for (int j = in_buf[i]; j ; --j)
         	alphabet[j] = alphabet[j-1];
         alphabet[0] = tmp;
-        buf[i] = buf_tmp;
     }
 }
 
