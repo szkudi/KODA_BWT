@@ -6,6 +6,8 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <stack>
 #include "BWT.h"
 using namespace std;
 
@@ -13,34 +15,63 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-    const int dataSize = 16;
-    const int blockSize = 3;
+    int dataSize;
+    //const int blockSize = 54;
+    const int blockSize = 10600;
 
-    char input[dataSize] = "ADBACCCABBBCCCA";
-    //char input[dataSize] = "BFFFBBBBFFFFFFB";
-    //char input[blockSize+1] = "kajak";
-    //char input[dataSize] = "ADAM";
+    char* input;
+
+    //ifstream file (argv[1], ios::in|ios::binary|ios::ate);
+    ifstream file (argv[1], ios::in|ios::binary|ios::ate);
+    if (file.is_open())
+    {
+        dataSize = file.tellg();
+        input = new char [dataSize];
+        file.seekg (0, ios::beg);
+        file.read (input, dataSize);
+        file.close();
+    }
+    else
+    {
+        cout << "Unable to open file"<<endl;
+        return 1;
+    }
+
     int codedSize;
     if(dataSize%blockSize!=0)
         codedSize = dataSize+(static_cast<int>(dataSize/blockSize)+1)*sizeof(int);
     else
         codedSize = dataSize+static_cast<int>(dataSize/blockSize)*sizeof(int);
 
-    char *output = new char[codedSize];
-    char *out = new char[dataSize];
+    unsigned char *output = new unsigned char[codedSize];
+    unsigned char *out = new unsigned char[dataSize];
 
     BWTcoder coder(blockSize);
     BWTdecoder decoder(blockSize);
 
-    coder.code(input,output,dataSize);
+    coder.code(reinterpret_cast<unsigned char*>(input),output,dataSize);
 
     decoder.decode(output,out,codedSize);
 
     for(int i=0;i<dataSize;i++)
         cout<<out[i];
 
+    /*fstream fileW ("/home/trapi/NetBeansProjects/KODA/main.copy", ios::out|ios::binary|ios::trunc);
+    if (fileW.is_open())
+    {
+        fileW.seekg (0, ios::beg);
+        fileW.write (out, dataSize);
+        fileW.close();
+    }
+    else
+    {
+        cout << "Unable to open file"<<endl;
+        return 1;
+    }*/
+
     delete[] output;
     delete[] out;
+    delete[] input;
 
     return 0;
 }

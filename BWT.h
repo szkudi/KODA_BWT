@@ -18,9 +18,9 @@ public:
      * @param output
      * @param dataSize
      */
-    void code(char* input, char* output, int dataSize);
+    void code(unsigned char* input, unsigned char* output, int dataSize);
 private:
-    int _BWTcodeBlock(char* input, char* output,int blockSize);
+    int _BWTcodeBlock(unsigned char* input, unsigned char* output,int blockSize);
 
     /**
      * Sort suffixes using Itoh's algorithm
@@ -28,7 +28,7 @@ private:
      * @param int* A result - sorted lexicographically indexes of chars from input
      * @param int blockSize size of input
      */
-    void _sortSuffixes(char* input, int* A,int blockSize);
+    void _sortSuffixes(unsigned char* input, int* A,int blockSize);
 
     /**
      * Does radix sort considering next bytes (first byte is the same for whole group)
@@ -38,7 +38,7 @@ private:
      * @param int start index from A - first element from the group to be sorted
      * @param int end index from A - one element after the last one to be sorted (sort el. from start to end-1)
      */
-    void _radixSort(char* input,int blockSize,int* A,int start,int end);
+    void _radixSort(unsigned char* input,int blockSize,int* A,int start,int end);
 
     int _blockSize;
     int* _A;
@@ -64,10 +64,10 @@ public:
      * @param output needs dataSize*sizeof(char)
      * @param dataSize
      */
-    void decode(char* input, char* output, int dataSize);
+    void decode(unsigned char* input, unsigned char* output, int dataSize);
 private:
-    void _BWTdecodeBlock(char* input, int b1, char* output, int blockSize);
-    void _makeLookupInVP(char *input,int* lookup,int blockSize);
+    void _BWTdecodeBlock(unsigned char* input, int b1, unsigned char* output, int blockSize);
+    void _makeLookupInVP(unsigned char *input,int* lookup,int blockSize);
 
     int* _VT;
     int _blockSize;

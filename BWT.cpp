@@ -7,6 +7,8 @@
 
 #include "BWT.h"
 #include <stack>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -18,7 +20,7 @@ BWTcoder::~BWTcoder() {
     delete[] _A;
 }
 
-void BWTcoder::code(char* input, char* output, int dataSize)
+void BWTcoder::code(unsigned char* input, unsigned char* output, int dataSize)
 {
     int b1;
     int *temp;
@@ -26,17 +28,19 @@ void BWTcoder::code(char* input, char* output, int dataSize)
     for(i=dataSize,j=0;i-_blockSize>0;i-=_blockSize,j++)
     {
         b1 = _BWTcodeBlock(&input[j*_blockSize],&output[j*(_blockSize+sizeof(int))],_blockSize);
+        
         //store b1:
         temp = reinterpret_cast<int*>(&output[(j+1)*_blockSize+j*sizeof(int)]);
         *temp = b1;
     }
     //store last block:
     b1 = _BWTcodeBlock(&input[j*_blockSize],&output[j*(_blockSize+sizeof(int))],i);
+    //cout<<j*_blockSize<<' '<<j*(_blockSize+sizeof(int))<<' '<<j*_blockSize+j*sizeof(int)+i<<endl;
     temp = reinterpret_cast<int*>(&output[j*_blockSize+j*sizeof(int)+i]);
     *temp = b1;
 }
 
-int BWTcoder::_BWTcodeBlock(char* input, char* output,int blockSize)
+int BWTcoder::_BWTcodeBlock(unsigned char* input, unsigned char* output,int blockSize)
 {
     if(blockSize==1)
     {
@@ -71,9 +75,9 @@ int BWTcoder::_BWTcodeBlock(char* input, char* output,int blockSize)
  * @param int start index from A - first element from the group to be sorted
  * @param int end index from A - one element after the last one to be sorted (sort el. from start to end-1)
  */
-void BWTcoder::_radixSort(char* input,int blockSize,int* A,int start,int end)
+void BWTcoder::_radixSort(unsigned char* input,int blockSize,int* A,int start,int end)
 {
-    int* tmp = new int[end-start];
+    int* tmp = new int[end-start+1];
     stack<classForRadix> stackForRadix;
     stackForRadix.push(classForRadix(1,start,end));
 
@@ -99,7 +103,7 @@ void BWTcoder::_radixSort(char* input,int blockSize,int* A,int start,int end)
 
         for(int i=s;i<e;i++)//count elements
         {
-            if(dist==blockSize-1)//consider $(end of string, just to protect from looping)
+            if(dist==blockSize)//consider $(end of string, just to protect from looping)
             {
                 bucket[256]++;
             }
@@ -118,7 +122,7 @@ void BWTcoder::_radixSort(char* input,int blockSize,int* A,int start,int end)
 
         for(int i=s;i<e;i++)
         {
-            if(dist==blockSize-1)
+            if(dist==blockSize)
             {
                 tmp[index[256]]=A[i];
                 index[256]++;
@@ -144,6 +148,8 @@ void BWTcoder::_radixSort(char* input,int blockSize,int* A,int start,int end)
         }
     }
 
+    delete[] tmp;
+
 }
 
 /**
@@ -152,9 +158,12 @@ void BWTcoder::_radixSort(char* input,int blockSize,int* A,int start,int end)
  * @param int* A result - sorted lexicographically indexes of chars from input
  * @param int blockSize size of input
  */
-void BWTcoder::_sortSuffixes(char* input, int* A,int blockSize)
+void BWTcoder::_sortSuffixes(unsigned char* input, int* A,int blockSize)
 {
     int bucketSizeX[256],bucketSizeY[256],bucketPtrX[256],bucketPtrY[256];
+
+    for(int i=0;i<blockSize;i++)
+        A[i]=-1;
 
     for(int i=0;i<256;i++)//step 1-1
     {
@@ -162,10 +171,10 @@ void BWTcoder::_sortSuffixes(char* input, int* A,int blockSize)
         bucketSizeY[i]=0;
     }
 
-    blockSize--;
+    //blockSize--;
     for(int i=0;i<blockSize;i++)//step 1-2
-    {
-        if(input[i]>input[i+1])
+    {///e:eae
+        if(input[i]>input[(i+1)%blockSize])
         {
             bucketSizeX[input[i]]++;
         }
@@ -174,8 +183,8 @@ void BWTcoder::_sortSuffixes(char* input, int* A,int blockSize)
             bucketSizeY[input[i]]++;
         }
     }
-    blockSize++;
-    bucketSizeY[input[blockSize-1]]++;
+    /*blockSize++;
+    bucketSizeY[input[blockSize-1]]++;*/
 
     //step 1-3:
     bucketPtrX[0]=0;
@@ -187,36 +196,52 @@ void BWTcoder::_sortSuffixes(char* input, int* A,int blockSize)
     }
 
     //step1-4
-    blockSize--;
-    for(int i=0;i<blockSize;i++)
+    //blockSize--;
+    for(int i=0,j=0;i<blockSize;i++)
     {
-        if(input[i]<=input[i+1])//in Y
+        j=i+1;
+        if(i+1==blockSize)
+            j=0;
+
+        if(input[i]<=input[j])//in Y
         {
             A[bucketPtrY[input[i]]]=i;
             bucketPtrY[input[i]]++;
         }
     }
-    blockSize++;
+    /*blockSize++;
 
     A[bucketPtrY[input[blockSize-1]]]=blockSize-1;
-    bucketPtrY[input[blockSize-1]]++;
+    bucketPtrY[input[blockSize-1]]++;*/
 
     for(int i=0;i<256;i++)//step 2
     {
         if(bucketSizeY[i]>1)
         {
-            //sort from bucketPtrY[i]-bucketSizeY+1 to bucketPtrY[i]
+            //sort from bucketPtrY[i]-bucketSizeY[i]+1 to bucketPtrY[i]
+            //cout<<"sort from "<<bucketPtrY[i]-bucketSizeY[i]+1<<" to "<<bucketPtrY[i]<<endl;
             _radixSort(input,blockSize,A,(bucketPtrY[i]-bucketSizeY[i]),bucketPtrY[i]);
         }
     }
 
-    for(int i=0;i<blockSize;i++)//step 3
+    for(int i=0,j=0;i<blockSize;i++)//step 3
     {
-        //cout<<A[i]<<' '<<input[A[i]]<<endl;
-        if(input[A[i]-1]>input[A[i]])//A[i]-1 in X
+        if(A[i]>0)
         {
-            A[bucketPtrX[input[A[i]-1]]]=A[i]-1;
-            bucketPtrX[input[A[i]-1]]++;
+            //cout<<A[i]<<' '<<input[A[i]]<<endl;
+            if(input[A[i]-1]>input[A[i]])//A[i]-1 in X
+            {
+                A[bucketPtrX[input[A[i]-1]]]=A[i]-1;
+                bucketPtrX[input[A[i]-1]]++;
+            }
+        }
+        else//A[i]==0
+        {
+            if(input[blockSize-1]>input[A[i]])//A[i]-1 in X
+            {
+                A[bucketPtrX[input[blockSize-1]]]=blockSize-1;
+                bucketPtrX[input[blockSize-1]]++;
+            }
         }
     }
 
@@ -230,7 +255,7 @@ BWTdecoder::~BWTdecoder() {
     delete[] _VT;
 }
 
-void BWTdecoder::decode(char* input, char* output, int dataSize)
+void BWTdecoder::decode(unsigned char* input, unsigned char* output, int dataSize)
 {
     int b1;
     int *temp;
@@ -241,14 +266,14 @@ void BWTdecoder::decode(char* input, char* output, int dataSize)
         temp = reinterpret_cast<int*>(&input[(j+1)*_blockSize+j*sizeof(int)]);
         b1 = *temp;
         _BWTdecodeBlock(&input[j*(_blockSize+sizeof(int))],b1,&output[j*_blockSize],_blockSize);
-
     }
     temp = reinterpret_cast<int*>(&input[j*(_blockSize+sizeof(int))+i-sizeof(int)]);
     b1 = *temp;
     _BWTdecodeBlock(&input[j*(_blockSize+sizeof(int))],b1,&output[j*_blockSize],i-intSize);
+    //cout<<j*_blockSize<<' '<<j*(_blockSize+sizeof(int))+i-sizeof(int)<<' '<<j*(_blockSize+sizeof(int))+i-sizeof(int)<<endl;
 }
 
-void BWTdecoder::_BWTdecodeBlock(char* input, int b1, char* output, int blockSize)
+void BWTdecoder::_BWTdecodeBlock(unsigned char* input, int b1, unsigned char* output, int blockSize)
 {
     if(blockSize==1)
     {
@@ -276,7 +301,7 @@ void BWTdecoder::_BWTdecodeBlock(char* input, int b1, char* output, int blockSiz
 
 }
 
-void BWTdecoder::_makeLookupInVP(char *input,int* lookup,int blockSize)
+void BWTdecoder::_makeLookupInVP(unsigned char *input,int* lookup,int blockSize)
 {
     int bucket[256];
 
