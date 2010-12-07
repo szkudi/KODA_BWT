@@ -14,7 +14,7 @@ using namespace std;
  */
 int main(int argc, char** argv) {
     const int dataSize = 16;
-    const int blockSize = 5;
+    const int blockSize = 3;
 
     char input[dataSize] = "ADBACCCABBBCCCA";
     //char input[dataSize] = "BFFFBBBBFFFFFFB";

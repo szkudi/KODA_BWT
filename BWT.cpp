@@ -38,6 +38,12 @@ void BWTcoder::code(char* input, char* output, int dataSize)
 
 int BWTcoder::_BWTcodeBlock(char* input, char* output,int blockSize)
 {
+    if(blockSize==1)
+    {
+        output[0]=input[0];
+        return -1;
+    }
+
     int b1;
     //cout<<input<<endl;
 
@@ -244,6 +250,12 @@ void BWTdecoder::decode(char* input, char* output, int dataSize)
 
 void BWTdecoder::_BWTdecodeBlock(char* input, int b1, char* output, int blockSize)
 {
+    if(blockSize==1)
+    {
+        output[0]=input[0];
+        return;
+    }
+
     int lookup[256];
     int idx;
 
