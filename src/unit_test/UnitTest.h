@@ -15,6 +15,9 @@
 #include "../second_step/DC.h"
 #include "../second_step/MTF.h"
 #include "../second_step/IF.h"
+#include "../second_step/RLE_2.h"
+#include "../second_step/IFC.h"
+
 
 using namespace std;
 using namespace SecondStepAlgs;
@@ -41,6 +44,12 @@ public:
 
 	void testIFEncode(IF& mtf);
 	void testIFDecode(IF& mtf);
+
+	void testIFCEncode(IFC& mtf);
+	void testIFCDecode(IFC& mtf);
+
+	void testRLE_2Encode(RLE_2& mtf);
+	void testRLE_2Decode(RLE_2& mtf);
 
 private:
 	template<typename T>

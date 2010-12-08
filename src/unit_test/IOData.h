@@ -20,6 +20,11 @@ static const unsigned int output_if[] = {0x1, 0x1, 0x0, 0x9, 0x0, 0x0, 0x2, 0x5,
 
 static const uint8_t output_mtf[] = {0x63, 0x00, 0x00, 0x62, 0x00, 0x00, 0x64, 0x00, 0x00, 0x64};
 
+static const uint8_t output_rle_2[] = {0x63, 0x63, 0x61, 0x61, 0x64, 0x64, 0x62};
+
+//static const uint8_t output_ifc[] = {0x64, 0x00, 0x01, 0x00, 0x64, 0x00, 0x63};
+static const uint8_t output_ifc[] = {0x63, 0x00, 0x62, 0x00, 0x64, 0x00, 0x64};
+
 static const unsigned int output_dc[] = {0x01, 0x01, 0x00, 0x01, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00};
 
 static const int dict_dc[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  -1,  -1, - 1,  -1, -1, -1, -1, -1,
@@ -46,6 +51,8 @@ static const int num_elem_if[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 								  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 								  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 								  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+static const int rle_buff[] = {0x3, 0x3, 0x3};
 
 
 

@@ -15,6 +15,8 @@ int main(){
 	SecondStepAlgs::MTF mtf;
 	SecondStepAlgs::DC dc;
 	SecondStepAlgs::IF invfreq;
+	SecondStepAlgs::RLE_2 rle_2;
+	SecondStepAlgs::IFC ifc;
 
 	test.testMTFEncode(mtf);
 
@@ -27,6 +29,14 @@ int main(){
 	test.testIFEncode(invfreq);
 
 	test.testIFDecode(invfreq);
+
+	test.testRLE_2Encode(rle_2);
+
+	test.testRLE_2Decode(rle_2);
+
+	test.testIFCEncode(ifc);
+
+	test.testIFCDecode(ifc);
 
 	return 0;
 

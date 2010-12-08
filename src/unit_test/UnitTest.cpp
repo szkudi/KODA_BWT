@@ -133,6 +133,79 @@ void UnitTest::testIFDecode(IF & invfreq){
 	delete[] ret;
 }
 
+void UnitTest::testRLE_2Encode(RLE_2 & rle){
+	cout << "Run lenght encoding 2 encoding test: " << endl;
+
+	uint8_t* ret = new uint8_t[data_size];
+	int size = rle.encodeBuf(input_data, ret, data_size);
+	int* buff = rle.getRLE_buffer();
+	int rle_size = rle.getSizeRLE_buffer();
+
+	if(compareData(ret, output_rle_2, size) && compareData(rle_buff, rle_buff, rle_size)){
+		cout << "Correct" << endl;
+	}else{
+		writeOutputData("Dane wejściowe: ", input_data, data_size, true);
+		writeOutputData("Retuned data: ", ret, size, true);
+		writeOutputData("Bufor RLE: ",buff, rle_size);
+		writeOutputData("Should be: ", output_if, data_size);
+	}
+
+	delete[] ret;
+	delete[] buff;
+}
+
+void UnitTest::testRLE_2Decode(RLE_2 & rle){
+	cout << "Run length encoding 2 decoding test: " << endl;
+
+	rle.setRLE_buffer(rle_buff, 3);
+	uint8_t* ret = new uint8_t[7 + rle.getResizeValueRLE_buffer()];
+	rle.decodeBuf(output_rle_2, ret, 7);
+
+	if(compareData(ret, input_data, data_size)){
+		cout << "Correct" << endl;
+	}else{
+		writeOutputData("Dane wejściowe: ", output_rle_2, 7, true);
+		writeOutputData("Retuned data: ", ret, 7 + rle.getResizeValueRLE_buffer(), true);
+		writeOutputData("Should be: ", input_data, data_size, true);
+	}
+
+	delete[] ret;
+}
+
+void UnitTest::testIFCEncode(IFC & ifc){
+	cout << "Inversion Frequencies encoding test: " << endl;
+
+	uint8_t* ret = new uint8_t[7];
+	ifc.encodeBuf(output_rle_2, ret, 7);
+
+	if(compareData(ret, output_ifc, 7)){
+		cout << "Correct" << endl;
+	}else{
+		writeOutputData("Dane wejściowe: ", output_rle_2, 7, true);
+		writeOutputData("Retuned data: ", ret, 7);
+		writeOutputData("Should be: ", output_ifc, 7);
+	}
+
+	delete[] ret;
+}
+
+void UnitTest::testIFCDecode(IFC & ifc){
+	cout << "Incremental Frequency Count decoding test: " << endl;
+
+	uint8_t* ret = new uint8_t[7];
+	ifc.decodeBuf(output_ifc, ret, 7);
+
+	if(compareData(ret, output_rle_2, 7)){
+		cout << "Correct" << endl;
+	}else{
+		writeOutputData("Dane wejściowe: ", output_ifc, 7);
+		writeOutputData("Retuned data: ", ret, 7, true);
+		writeOutputData("Should be: ", output_rle_2, 7, true);
+	}
+
+	delete[] ret;
+}
+
 template<typename T>
 void UnitTest::writeOutputData(const char* str, const T* data, int data_size, bool character){
 	printf("%s", str);
@@ -156,4 +229,3 @@ bool UnitTest::compareData(const T *first, const T *second, int data_size){
 
 
 }//namespace UTest
-
