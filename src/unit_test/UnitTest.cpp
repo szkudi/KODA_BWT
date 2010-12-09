@@ -175,18 +175,33 @@ void UnitTest::testRLE_2Decode(RLE_2 & rle){
 void UnitTest::testIFCEncode(IFC & ifc){
 	cout << "Inversion Frequencies encoding test: " << endl;
 
-	uint8_t* ret = new uint8_t[7];
-	ifc.encodeBuf(output_rle_2, ret, 7);
+	char tekst[] = "Toooo jjjeessst jjjaaakkkiissss ttttteeekkkkkkkkkkkstttttt";
+	int size = 58;
 
-	if(compareData(ret, output_ifc, 7)){
-		cout << "Correct" << endl;
-	}else{
-		writeOutputData("Dane wejściowe: ", output_rle_2, 7, true);
-		writeOutputData("Retuned data: ", ret, 7);
-		writeOutputData("Should be: ", output_ifc, 7);
-	}
+	uint8_t* ret = new uint8_t[size];
+	uint8_t* ret2 = new uint8_t[size];
+	ifc.encodeBuf(reinterpret_cast<uint8_t*>(tekst), ret, size);
+
+	ifc.decodeBuf(ret, ret2, size);
+
+	writeOutputData("Dane wejściowe: ", tekst, size, true);
+	writeOutputData("Retuned data: ", ret, size);
+	writeOutputData("Ret2: ", ret2, size, true);
+
+
+//	uint8_t* ret = new uint8_t[7];
+//	ifc.encodeBuf(output_rle_2, ret, 7);
+//
+//	if(compareData(ret, output_ifc, 7)){
+//		cout << "Correct" << endl;
+//	}else{
+//		writeOutputData("Dane wejściowe: ", output_rle_2, 7, true);
+//		writeOutputData("Retuned data: ", ret, 7);
+//		writeOutputData("Should be: ", output_ifc, 7);
+//	}
 
 	delete[] ret;
+	delete[] ret2;
 }
 
 void UnitTest::testIFCDecode(IFC & ifc){

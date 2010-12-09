@@ -52,16 +52,26 @@ private:
 	 * Method used to generate starting alphabet
 	 */
 	void init(bool lst_only = false);
+	int findIndex(uint8_t num);
 
 	static const int alphabet_size = 256;
 
+	typedef struct {
+		uint8_t symbol;
+		int index;
+		double counter;
+	} alphabeth_element;
+
 	uint8_t alphabeth_list[alphabet_size];
 	int alphabeth_index[alphabet_size];
-	int alphabeth_counter[alphabet_size];
+	double alphabeth_counter[alphabet_size];
+
+//	alphabeth_element alphabet[alphabet_size];
 
 	//Algorithm parameters
 	int window_size, dm, q, t, rb;
 };
+
 
 }
 
