@@ -55,7 +55,7 @@ int RLE_2::encodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
 		RLE_buffer.push_back(run_length);
 	}
 
-	return output_index + 1;
+	return output_index;
 
 }
 
