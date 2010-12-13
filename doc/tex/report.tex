@@ -1,0 +1,108 @@
+\documentclass[a4paper,12pt]{article}
+
+
+\usepackage[MeX]{polski}
+\usepackage[utf8]{inputenc}	% kodowanie znaków
+\usepackage{indentfirst}
+
+\usepackage{upquote}  	% zamiana cudzysłowów klasycznych (,, ") na górne (" ") w kodach źródłowych
+\usepackage{graphicx}	% wstawianie obrazków
+\usepackage{amsmath}
+\usepackage{listings}
+
+
+\def\PICSDIR{PICS}
+
+% Ustawienie marginesów
+\oddsidemargin=0.5cm
+\evensidemargin=-0.5cm
+\topmargin=0cm
+\textwidth=16cm
+\textheight=23cm
+
+% Ładniejsze tabelki
+\usepackage{booktabs}
+
+
+\frenchspacing
+
+\clubpenalty=10000		% to kara za sierotki
+\widowpenalty=10000		% nie pozostawia wdów
+\brokenpenalty=10000 	% nie dzieli wyrazów pomiędzy stronami
+
+
+\sloppy
+
+% Pakiety z ładnymi czcionkami
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+
+% Ładniejsze tabelki
+\usepackage{booktabs}
+
+% Ustawienia wyglądu listingów
+\lstset{
+	language=C++,                               % choose the default language of the code
+	basicstyle=\footnotesize\ttfamily,       	% the size of the fonts that are used for the code
+	numbers=left,                   		% where to put the line-numbers
+%	numberstyle=\tiny,      			% the size of the fonts that are used for the line-numbers
+	stepnumber=1,                   		% the step between two line-numbers. If it's 1 each line will be numbered
+	numbersep=5pt,                  		% how far the line-numbers are from the code
+	showspaces=false,               		% show spaces adding particular underscores
+	showstringspaces=false,         	% underline spaces within strings
+	showtabs=false,                 		% show tabs within strings adding particular underscores
+	tabsize=4,	                		% sets default tabsize
+	captionpos=b,                   		% sets the caption-position
+	breaklines=true,                		% sets automatic line breaking
+	breakatwhitespace=true,        	% sets if automatic breaks should only happen at whitespace
+	extendedchars=true,
+	keywordstyle=\bfseries,
+	identifierstyle=,
+	commentstyle=\slshape,
+	stringstyle=\slshape,
+	xleftmargin=30pt,
+	frame=tb,
+	framexleftmargin=30pt,
+}
+
+\begin{document}
+
+\title{{\small Kompresja danych}\\Implementacja BWT oraz algorytmów dodatkowych}
+\author{Jakub Machoń, Łukasz Banaśkiewicz, Kacper Szkudlarek}
+
+\maketitle
+
+\begin{abstract}
+Transformata Burrowsa-Wheelera to algorytm użyteczny przy bezstratnej kompresji danych. Dane po przetworzeniu tą transformacją dają się znacznie lepiej skompresować za pomocą klasycznych algorytmów kompresji. W ramach projektu powstała implementacja transformaty oraz kilku algorytmów drugiego kroku wykorzystywanych razem z BWT.
+\end{abstract}
+
+
+\section{Wstęp}
+
+
+\section{Implementacja}
+
+\subsection{Transformata Burrowsa-Wheelera}
+
+\subsection{RLE0 i RLE2}
+
+\subsection{Increment Frequency Count}
+
+\subsection{Distance Codding}
+
+\subsection{Move To Front}
+
+\subsection{Invesrion Frequencies}
+
+\section{Testy}
+
+\subsection{Aplikacja testująca}
+
+\subsection{Testy wydajności}
+
+\subsubsection{Dane testowe}
+
+\subsubsection{Wyniki}
+
+\end{document}
