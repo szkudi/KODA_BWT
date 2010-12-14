@@ -1,7 +1,7 @@
 # Create a variable containing all .cpp files
 FILE(GLOB files *.cpp)
 
-set(ALG_LIBS DC MTF IF RLE_2 IFC)
+set(ALG_LIBS DC MTF IF RLE_2 IFC RLE HuffmanCoder)
 
 # Create an executable file from sources
 #ADD_EXECUTABLE(koda_bwt ${files})

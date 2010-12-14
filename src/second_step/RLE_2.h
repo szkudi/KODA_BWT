@@ -50,9 +50,30 @@ public:
 	 * \return Decoded data is returned via pointer given to method
 	 */
 	void decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
-    int* getRLE_buffer() const;
+    /*!
+     * Method returning vector containing runs lengths in array form
+     *
+     * \ret pointer to runs lengths array
+     */
+	int* getRLE_buffer() const;
+	/*!
+	 * Method returning size of runs length vector
+	 *
+	 * \return vector size
+	 */
     int getSizeRLE_buffer() const;
+    /*!
+     * Method calculate how much longer will be decoded data
+     *
+     * \return extra data length
+     */
     int getResizeValueRLE_buffer() const;
+    /*!
+     * Method to setup runs length vector
+     *
+     * \param buffer - pointer to data
+     * \param size - data length
+     */
     void setRLE_buffer(const int* buffer, int size);
 
 private:

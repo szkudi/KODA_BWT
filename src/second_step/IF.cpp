@@ -21,7 +21,7 @@ IF::IF() {
 IF::~IF() {
 }
 
-void IF::encodeBuf(const uint8_t *in_buf, unsigned int *out_buf, int buf_size){
+void IF::encodeBuf(const uint8_t *in_buf, int32_t *out_buf, int buf_size){
 
 	init();
 
@@ -35,26 +35,51 @@ void IF::encodeBuf(const uint8_t *in_buf, unsigned int *out_buf, int buf_size){
 		}
 	}
 
-	int k = 0;
+	int out_pos = 1;
+	int count = 0;
+
+	for(int i = 0; i < alphabet_size; ++i){
+		if(num_elem[i] > 0){
+			count++;
+			out_buf[out_pos++] = i;
+			out_buf[out_pos++] = num_elem[i];
+		}
+	}
+
+	out_buf[0] = count;
+
 	for(int i = 0; i < alphabet_size; ++i){
 		for(unsigned int j = 0; j < ret_value[i].size(); ++j){
-			out_buf[k++] = ret_value[i][j];
+			out_buf[out_pos++] = ret_value[i][j];
 		}
 	}
 }
 
-void IF::decodeBuf(const unsigned int *in_buf, uint8_t *out_buf, int buf_size){
+void IF::decodeBuf(const int32_t *in_buf, uint8_t *out_buf, int buf_size){
 
-	memset(out_buf, 255, sizeof(uint8_t) * buf_size);
 
-	int in = 0;//input buffer index
+	int in = 1;//input buffer index
 	int out = 0; //output buffer index
 	int tmp;
 
-	cout << "Begin" << endl;
+	init();
+
+	int count = in_buf[0];
+//	cout << count << endl;
+	for(int i = 0; i < count; ++i){
+		num_elem[in_buf[in]] = in_buf[in + 1];
+		in += 2;
+	}
+
+	memset(out_buf, 255, sizeof(uint8_t) * buf_size);
+
+
+//	cout << "Begin " <<  in << endl;
 	for(int i = 0; i < alphabet_size; ++i){ //for each alphabet symbol
 		if(num_elem[i] > 0){
+//			cout << i << " " << in << " num = " << num_elem[i] <<  endl;
 			out = in_buf[in];
+//			cout << out << endl;
 			out_buf[out++] = i;
 			for(int j = 1; j < num_elem[i]; ++j){ //for each occurrence of that symbol
 				tmp = in_buf[in + j];
@@ -67,6 +92,7 @@ void IF::decodeBuf(const unsigned int *in_buf, uint8_t *out_buf, int buf_size){
 					}
 				}
 				out_buf[out] = i;
+//				cout << out << endl;
 			}
 			in += num_elem[i];
 		}
@@ -74,7 +100,7 @@ void IF::decodeBuf(const unsigned int *in_buf, uint8_t *out_buf, int buf_size){
 
 }
 
-void IF::setNum_elem(const int *start){
+void IF::setNum_elem(const int32_t *start){
 	memcpy(num_elem, start, sizeof(int) * alphabet_size);
 }
 
@@ -83,10 +109,10 @@ void IF::init(){
 	memset(actual_dist, 0, sizeof(int) * alphabet_size);
 
 	for(int i = 0; i < alphabet_size; ++i)
-		ret_value.push_back(vector<int>());
+		ret_value.push_back(vector<int32_t>());
 }
 
-int *IF::getNum_elem() const{
+int32_t *IF::getNum_elem() const{
 	int *tmp =  new int[alphabet_size];
 	memcpy(tmp, num_elem, sizeof(int) * alphabet_size);
 
