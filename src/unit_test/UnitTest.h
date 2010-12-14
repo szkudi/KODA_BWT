@@ -17,6 +17,8 @@
 #include "../second_step/IF.h"
 #include "../second_step/RLE_2.h"
 #include "../second_step/IFC.h"
+#include "../second_step/RLE.h"
+#include "../second_step/HuffmanCoder.h"
 
 
 using namespace std;
@@ -36,20 +38,26 @@ public:
 	~UnitTest();
 
 
-	void testDCEncode(DC& dc);
-	void testDCDecode(DC& dc);
+	void testDCEncode(DC&);
+	void testDCDecode(DC&);
 
-	void testMTFEncode(MTF& mtf);
-	void testMTFDecode(MTF& mtf);
+	void testMTFEncode(MTF&);
+	void testMTFDecode(MTF&);
 
-	void testIFEncode(IF& mtf);
-	void testIFDecode(IF& mtf);
+	void testIFEncode(IF&);
+	void testIFDecode(IF&);
 
-	void testIFCEncode(IFC& mtf);
-	void testIFCDecode(IFC& mtf);
+	void testIFCEncode(IFC&);
+	void testIFCDecode(IFC&);
 
-	void testRLE_2Encode(RLE_2& mtf);
-	void testRLE_2Decode(RLE_2& mtf);
+	void testRLE_2Encode(RLE_2&);
+	void testRLE_2Decode(RLE_2&);
+
+	void testRLEEncode(RLE&);
+	void testRLEDecode(RLE&);
+
+	void testHuffmanEncode(HuffmanCoder&);
+	void testHuffmanDecode(HuffmanCoder&);
 
 private:
 	template<typename T>

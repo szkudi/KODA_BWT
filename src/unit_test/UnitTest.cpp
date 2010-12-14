@@ -59,35 +59,36 @@ void UnitTest::testMTFDecode(MTF & mtf){
 void UnitTest::testDCEncode(DC & dc){
 	cout << "Distance Coding encoding test: " << endl;
 
-	unsigned int* ret = new unsigned int[data_size];
+	unsigned int* ret = new unsigned int[2 * data_size];
+	memset(ret, 0, sizeof(unsigned int) * 2 * data_size);
 	dc.encodeBuf(input_data, ret, data_size);
-	int* dict = dc.getStart_dst();
+//	int* dict = dc.getStart_dst();
 
-	if(compareData<unsigned int>(ret, output_dc, data_size) && compareData<int>(dict, dict_dc, 256)){
+	if(compareData<unsigned int>(ret, output_dc, data_size)){// && compareData<int>(dict, dict_dc, 256)){
 		cout << "Correct" << endl;
 	}else{
 		writeOutputData("Dane wejściowe: ", input_data, data_size);
-		writeOutputData("Retuned data: ", ret, data_size);
-		writeOutputData("Słownik: ",dict, 256);
-		writeOutputData("Should be: ", output_dc, data_size);
+		writeOutputData("Retuned data: ", ret,  data_size + 9);
+//		writeOutputData("Słownik: ",dict, 256);
+		writeOutputData("Should be: ", output_dc, data_size + 9);
 	}
 
 	delete[] ret;
-	delete[] dict;
+//	delete[] dict;
 }
 
 void UnitTest::testDCDecode(DC & dc){
 	cout << "Distance Coding decoding test: " << endl;
 
 	uint8_t* ret = new uint8_t[data_size];
-	dc.setStart_dst(dict_dc);
+//	dc.setStart_dst(dict_dc);
 	dc.decodeBuf(output_dc, ret, data_size);
 
 	if(compareData<uint8_t>(ret, input_data, data_size)){
 		cout << "Correct" << endl;
 	}
 	else{
-		writeOutputData("Dane wejściowe: ", output_dc, data_size);
+		writeOutputData("Dane wejściowe: ", output_dc, data_size + 9);
 		writeOutputData("Retuned data: ", ret, data_size, true);
 		writeOutputData("Should be: ", input_data, data_size, true);
 	}
@@ -98,36 +99,38 @@ void UnitTest::testDCDecode(DC & dc){
 void UnitTest::testIFEncode(IF & invfreq){
 	cout << "Inversion Frequencies encoding test: " << endl;
 
-	unsigned int* ret = new unsigned int[data_size];
+	int32_t* ret = new int32_t[2 * data_size];
+	memset(ret, 0, sizeof(int32_t) * 2 * data_size);
 	invfreq.encodeBuf(if_input_data, ret, data_size);
-	int* num_elem = invfreq.getNum_elem();
+//	int* num_elem = invfreq.getNum_elem();
 
-	if(compareData(ret, output_if, data_size) && compareData(num_elem, num_elem_if, 256)){
+	if(compareData(ret, output_if, data_size + 9)){// && compareData(num_elem, num_elem_if, 256)){
 		cout << "Correct" << endl;
 	}else{
 		writeOutputData("Dane wejściowe: ", if_input_data, data_size);
-		writeOutputData("Retuned data: ", ret, data_size);
-		writeOutputData("Ilość elementów: ",num_elem, 256);
+		writeOutputData("Retuned data: ", ret, data_size + 9);
+//		writeOutputData("Ilość elementów: ",num_elem, 256);
 		writeOutputData("Should be: ", output_if, data_size);
 	}
 
 	delete[] ret;
-	delete[] num_elem;
+//	delete[] num_elem;
 }
 
 void UnitTest::testIFDecode(IF & invfreq){
 	cout << "Inversion Frequencies decoding test: " << endl;
 
 	uint8_t* ret = new uint8_t[data_size];
-	invfreq.setNum_elem(num_elem_if);
+	memset(ret, 0, sizeof(uint8_t) * data_size);
+//	invfreq.setNum_elem(num_elem_if);
 	invfreq.decodeBuf(output_if, ret, data_size);
 
-		if(compareData(ret, if_input_data, data_size)){
+	if(compareData(ret, if_input_data, data_size)){
 		cout << "Correct" << endl;
 	}else{
-		writeOutputData("Dane wejściowe: ", output_if, data_size);
+		writeOutputData("Dane wejściowe: ", output_if, data_size + 9);
 		writeOutputData("Retuned data: ", ret, data_size, true);
-		writeOutputData("Should be: ", if_input_data, data_size, true);
+//		writeOutputData("Should be: ", if_input_data, data_size, true);
 	}
 
 	delete[] ret;
@@ -175,7 +178,7 @@ void UnitTest::testRLE_2Decode(RLE_2 & rle){
 }
 
 void UnitTest::testIFCEncode(IFC & ifc){
-	cout << "Inversion Frequencies encoding test: " << endl;
+	cout << "Incremental Frequency Count encoding test: " << endl;
 
 //	char tekst[] = "Toooo jjjeessst jjjaaakkkiissss ttttteeekkkkkkkkkkkstttttt";
 //	int size = 58;
@@ -221,6 +224,85 @@ void UnitTest::testIFCDecode(IFC & ifc){
 	}
 
 	delete[] ret;
+}
+
+void UnitTest::testRLEEncode(RLE& rle){
+	cout << "Run Length Encoding encoding test: " << endl;
+
+	uint8_t* ret = new uint8_t[data_size];
+	int size = rle.encodeBuf(input_data, ret, data_size);
+
+	if(compareData(ret, output_rle, size)){
+		cout << "Correct" << endl;
+	}else{
+		writeOutputData("Dane wejściowe: ", input_data, data_size, true);
+		writeOutputData("Retuned data: ", ret, size);
+		writeOutputData("Should be: ", output_ifc, 7);
+	}
+
+	delete[] ret;
+}
+
+void UnitTest::testRLEDecode(RLE & rle){
+	cout << "Run Length Encoding decoding test: " << endl;
+
+	int size = rle.getResizeLength(output_rle, 8);
+
+	uint8_t* ret = new uint8_t[size];
+	rle.decodeBuf(output_rle, ret, 8);
+
+	if(compareData(ret, input_data, size)){
+		cout << "Correct" << endl;
+	}else{
+		writeOutputData("Dane wejściowe: ", output_rle, 8);
+		writeOutputData("Retuned data: ", ret, size, true);
+		writeOutputData("Should be: ", output_rle, 8, true);
+	}
+
+	delete[] ret;
+}
+
+void UnitTest::testHuffmanEncode(HuffmanCoder& hc){
+	cout << "Huffman Coder encoding test: " << endl;
+
+//	char tekst[] = "aaaabbbccd";
+
+	uint8_t* ret = new uint8_t[2 * data_size];
+	memset(ret, 0, sizeof(uint8_t) * 2 * data_size);
+//	int size = hc.encodeBuf((uint8_t*)tekst, ret, data_size);
+	int size = hc.encodeBuf(input_data, ret, data_size);
+
+//	cout << size << endl;
+
+	if(compareData(ret, output_huffman, ret[0] * 3 + size/8 + 2)){
+		cout << "Correct" << endl;
+	}else{
+		writeOutputData("Dane wejściowe: ", input_data, 8);
+		writeOutputData("Retuned data: ", ret, ret[0] * 3 + size/8 + 2);
+		writeOutputData("Should be: ", output_huffman, 8, true);
+	}
+
+	delete[] ret;
+
+}
+
+void UnitTest::testHuffmanDecode(HuffmanCoder& hc){
+	cout << "Huffman Coder decoding test: " << endl;
+
+	uint8_t* ret = new uint8_t[data_size];
+	hc.decodeBuf(output_huffman, ret, 20);
+
+	if(compareData(ret, input_data, data_size)){
+		cout << "Correct" << endl;
+	}else{
+		writeOutputData("Dane wejściowe: ", output_huffman, 14 + 20/8);
+		writeOutputData("Retuned data: ", ret, data_size, true);
+		writeOutputData("Should be: ", input_data, data_size, true);
+	}
+
+
+	delete[] ret;
+
 }
 
 template<typename T>

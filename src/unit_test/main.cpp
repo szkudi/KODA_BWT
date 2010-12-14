@@ -17,26 +17,29 @@ int main(){
 	SecondStepAlgs::IF invfreq;
 	SecondStepAlgs::RLE_2 rle_2;
 	SecondStepAlgs::IFC ifc;
+	SecondStepAlgs::RLE rle;
+	SecondStepAlgs::HuffmanCoder hc;
 
 	test.testMTFEncode(mtf);
-
 	test.testMTFDecode(mtf);
 
 	test.testDCEncode(dc);
-
 	test.testDCDecode(dc);
 
 	test.testIFEncode(invfreq);
-
 	test.testIFDecode(invfreq);
 
 	test.testRLE_2Encode(rle_2);
-
 	test.testRLE_2Decode(rle_2);
 
 	test.testIFCEncode(ifc);
-
 	test.testIFCDecode(ifc);
+
+	test.testRLEEncode(rle);
+	test.testRLEDecode(rle);
+
+	test.testHuffmanEncode(hc);
+	test.testHuffmanDecode(hc);
 
 	return 0;
 

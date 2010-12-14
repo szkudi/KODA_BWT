@@ -25,6 +25,8 @@ void DC::encodeBuf(const uint8_t* in_buf, unsigned int* out_buf, int buf_size){
 
 //	out_buf = new uint8_t[buf_size];
 //	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
+	int count = 0;
+	int out_pos = buf_size + 1;
 
 	init();
 
@@ -43,6 +45,15 @@ void DC::encodeBuf(const uint8_t* in_buf, unsigned int* out_buf, int buf_size){
 			out_buf[i] = 0;
 		}
 	}
+
+	for(int i = 0; i < alphabet_size; ++i){
+		if(start_pos[i] > -1){
+			count++;
+			out_buf[out_pos++] = i;
+			out_buf[out_pos++] = start_pos[i];
+		}
+	}
+	out_buf[buf_size] = count;
 }
 
 void DC::decodeBuf(const unsigned int* in_buf, uint8_t* out_buf, int buf_size){
@@ -51,6 +62,14 @@ void DC::decodeBuf(const unsigned int* in_buf, uint8_t* out_buf, int buf_size){
 	int tmp;
 //	out_buf = new uint8_t[buf_size];
 //	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
+
+	int count = in_buf[buf_size];
+	int in_pos = buf_size + 1;
+
+	for(int i = 0; i < count; ++i){
+		start_pos[in_buf[in_pos]] = in_buf[in_pos + 1];
+		in_pos += 2;
+	}
 
 	for(int i = 0; i < alphabet_size; ++i){
 		if((j = start_pos[i]) >= 0){
