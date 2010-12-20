@@ -55,7 +55,7 @@ public:
      *
      * \ret pointer to runs lengths array
      */
-	int* getRLE_buffer() const;
+	uint32_t* getRLE_buffer() const;
 	/*!
 	 * Method returning size of runs length vector
 	 *
@@ -74,12 +74,12 @@ public:
      * \param buffer - pointer to data
      * \param size - data length
      */
-    void setRLE_buffer(const int* buffer, int size);
+    void setRLE_buffer(const uint32_t* buffer, int size);
 
 private:
 //	uint8_t run_symbol;
 	int output_index;
-	vector<int> RLE_buffer;
+	vector<uint32_t> RLE_buffer;
 };
 
 }

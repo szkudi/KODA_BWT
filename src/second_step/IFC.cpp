@@ -33,9 +33,9 @@ void IFC::encodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
 	int lst_index_old;
 	int index = 0;
 
-	fstream lists("encode_list.txt", iostream::out|iostream::trunc);
-	fstream indexes("encode_indexes.txt", iostream::out|iostream::trunc);
-	fstream counters("encode_counters.txt", iostream::out|iostream::trunc);
+//	fstream lists("encode_list.txt", iostream::out|iostream::trunc);
+//	fstream indexes("encode_indexes.txt", iostream::out|iostream::trunc);
+//	fstream counters("encode_counters.txt", iostream::out|iostream::trunc);
 
 	init();
 
@@ -93,19 +93,19 @@ void IFC::encodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
 			alphabeth_index[alphabeth_list[lst_index_old + 1]] = lst_index_old + 1;
 		}
 
-		for(int x = 0 ; x < alphabet_size; ++x){
-			lists << (int)alphabeth_list[x] << " ";
-			indexes << alphabeth_index[x] << " ";
-			counters << alphabeth_counter[x] << " ";
-		}
-		lists << endl;
-		indexes << endl;
-		counters << endl;
+//		for(int x = 0 ; x < alphabet_size; ++x){
+//			lists << (int)alphabeth_list[x] << " ";
+//			indexes << alphabeth_index[x] << " ";
+//			counters << alphabeth_counter[x] << " ";
+//		}
+//		lists << endl;
+//		indexes << endl;
+//		counters << endl;
 	}
 
-	lists.close();
-	indexes.close();
-	counters.close();
+//	lists.close();
+//	indexes.close();
+//	counters.close();
 }
 
 void IFC::decodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
@@ -117,9 +117,9 @@ void IFC::decodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
 	int lst_index_old;
 	int index = 0;
 
-	fstream lists("decode_list.txt", iostream::out|iostream::trunc);
-	fstream indexes("decode_indexes.txt", iostream::out|iostream::trunc);
-	fstream counters("decode_counters.txt", iostream::out|iostream::trunc);
+//	fstream lists("decode_list.txt", iostream::out|iostream::trunc);
+//	fstream indexes("decode_indexes.txt", iostream::out|iostream::trunc);
+//	fstream counters("decode_counters.txt", iostream::out|iostream::trunc);
 
 	uint8_t symbol;
 
@@ -177,18 +177,18 @@ void IFC::decodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
 			alphabeth_index[alphabeth_list[lst_index_old + 1]] = lst_index_old + 1;
 		}
 
-		for(int x = 0 ; x < alphabet_size; ++x){
-			lists << (int)alphabeth_list[x] << " ";
-			indexes << alphabeth_index[x] << " ";
-			counters << alphabeth_counter[x] << " ";
-		}
-		lists << endl;
-		indexes << endl;
-		counters << endl;
+//		for(int x = 0 ; x < alphabet_size; ++x){
+//			lists << (int)alphabeth_list[x] << " ";
+//			indexes << alphabeth_index[x] << " ";
+//			counters << alphabeth_counter[x] << " ";
+//		}
+//		lists << endl;
+//		indexes << endl;
+//		counters << endl;
 	}
-	lists.close();
-	indexes.close();
-	counters.close();
+//	lists.close();
+//	indexes.close();
+//	counters.close();
 }
 
 void IFC::init(bool lst_only){

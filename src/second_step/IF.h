@@ -37,7 +37,7 @@ public:
 	 *
 	 * \return Encoded data is returned via pointer given to method
 	 */
-	void encodeBuf(const uint8_t* in_buf, int32_t* out_buf, int buf_size);
+	int encodeBuf(const uint8_t* in_buf, uint32_t* out_buf, int buf_size);
 	/*!
 	 * Method used to decode given encoded data
 	 *
@@ -47,18 +47,18 @@ public:
 	 *
 	 * \return Decoded data is returned via pointer given to method
 	 */
-	void decodeBuf(const int32_t* in_buf, uint8_t* out_buf, int buf_size);
+	void decodeBuf(const uint32_t* in_buf, uint8_t* out_buf, int buf_size);
 
 	/*!
 	 * Getter method for alphabet start positions.
 	 * \return pointer to copied data
 	 */
-	int32_t* getNum_elem() const;
+	uint32_t* getNum_elem() const;
 	/*!
 	 * Setter method for alphabet start position
 	 * \param start pointer to given data
 	 */
-    void setNum_elem(const int32_t *start);
+    void setNum_elem(const uint32_t *start);
 private:
 	/*!
 	 * Method used to generate starting alphabet
@@ -76,7 +76,7 @@ private:
 	int32_t num_elem[alphabet_size];
 	int actual_dist[alphabet_size];
 
-	vector< vector<int32_t> > ret_value;
+	vector< vector<uint32_t> > ret_value;
 
 };
 

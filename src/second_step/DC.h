@@ -34,7 +34,7 @@ public:
 	 *
 	 * \return Encoded data is returned via pointer given to method
 	 */
-	void encodeBuf(const uint8_t* in_buf, unsigned int* out_buf, int buf_size);
+	int encodeBuf(const uint8_t* in_buf, uint32_t* out_buf, int buf_size);
 	/*!
 	 * Method used to decode given encoded data
 	 *
@@ -44,7 +44,7 @@ public:
 	 *
 	 * \return Decoded data is returned via pointer given to method
 	 */
-	void decodeBuf(const unsigned int* in_buf, uint8_t* out_buf, int buf_size);
+	void decodeBuf(const uint32_t* in_buf, uint8_t* out_buf, int buf_size);
 
 	/*!
 	 * Getter method for alphabet start positions.

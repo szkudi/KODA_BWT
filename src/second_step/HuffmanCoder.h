@@ -44,10 +44,11 @@ public:
 	 *
 	 * \return Decoded data is returned via pointer given to method
 	 */
-	void decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
+	int decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
 
 	int* getAlphabet();
 	void setAlphabet(int* alphabet);
+	int getData_size();
 
 private:
 	/*!
@@ -84,6 +85,8 @@ private:
 	///Array containing used alphabet_weights
 	int alphabet_weights[alphabet_size];
 	int num_of_bits[alphabet_size];
+
+	int data_size;
 };
 
 class Node {

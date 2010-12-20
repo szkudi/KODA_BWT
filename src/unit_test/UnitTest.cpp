@@ -99,8 +99,8 @@ void UnitTest::testDCDecode(DC & dc){
 void UnitTest::testIFEncode(IF & invfreq){
 	cout << "Inversion Frequencies encoding test: " << endl;
 
-	int32_t* ret = new int32_t[2 * data_size];
-	memset(ret, 0, sizeof(int32_t) * 2 * data_size);
+	uint32_t* ret = new uint32_t[2 * data_size];
+	memset(ret, 0, sizeof(uint32_t) * 2 * data_size);
 	invfreq.encodeBuf(if_input_data, ret, data_size);
 //	int* num_elem = invfreq.getNum_elem();
 
@@ -141,7 +141,7 @@ void UnitTest::testRLE_2Encode(RLE_2 & rle){
 
 	uint8_t* ret = new uint8_t[data_size];
 	int size = rle.encodeBuf(input_data, ret, data_size);
-	int* buff = rle.getRLE_buffer();
+	uint32_t* buff = rle.getRLE_buffer();
 	int rle_size = rle.getSizeRLE_buffer();
 
 //	cout << size << endl;

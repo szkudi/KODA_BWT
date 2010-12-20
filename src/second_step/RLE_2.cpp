@@ -85,8 +85,8 @@ void RLE_2::decodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
 
 }
 
-int* RLE_2::getRLE_buffer() const{
-	int* ret = new int[RLE_buffer.size()];
+uint32_t* RLE_2::getRLE_buffer() const{
+	uint32_t* ret = new uint32_t[RLE_buffer.size()];
 
 	for(unsigned int i = 0; i < RLE_buffer.size(); ++i)
 		ret[i] = RLE_buffer[i];
@@ -108,7 +108,7 @@ int RLE_2::getResizeValueRLE_buffer() const{
 	return resize;
 }
 
-void RLE_2::setRLE_buffer(const int* buffer, int size){
+void RLE_2::setRLE_buffer(const uint32_t* buffer, int size){
 	RLE_buffer.clear();
 
 	for(int i = 0; i < size; ++i)
