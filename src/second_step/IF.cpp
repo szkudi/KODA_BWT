@@ -21,7 +21,7 @@ IF::IF() {
 IF::~IF() {
 }
 
-void IF::encodeBuf(const uint8_t *in_buf, int32_t *out_buf, int buf_size){
+int IF::encodeBuf(const uint8_t *in_buf, uint32_t *out_buf, int buf_size){
 
 	init();
 
@@ -53,9 +53,11 @@ void IF::encodeBuf(const uint8_t *in_buf, int32_t *out_buf, int buf_size){
 			out_buf[out_pos++] = ret_value[i][j];
 		}
 	}
+
+	return out_pos;
 }
 
-void IF::decodeBuf(const int32_t *in_buf, uint8_t *out_buf, int buf_size){
+void IF::decodeBuf(const uint32_t *in_buf, uint8_t *out_buf, int buf_size){
 
 
 	int in = 1;//input buffer index
@@ -100,7 +102,7 @@ void IF::decodeBuf(const int32_t *in_buf, uint8_t *out_buf, int buf_size){
 
 }
 
-void IF::setNum_elem(const int32_t *start){
+void IF::setNum_elem(const uint32_t *start){
 	memcpy(num_elem, start, sizeof(int) * alphabet_size);
 }
 
@@ -109,12 +111,12 @@ void IF::init(){
 	memset(actual_dist, 0, sizeof(int) * alphabet_size);
 
 	for(int i = 0; i < alphabet_size; ++i)
-		ret_value.push_back(vector<int32_t>());
+		ret_value.push_back(vector<uint32_t>());
 }
 
-int32_t *IF::getNum_elem() const{
-	int *tmp =  new int[alphabet_size];
-	memcpy(tmp, num_elem, sizeof(int) * alphabet_size);
+uint32_t *IF::getNum_elem() const{
+	uint32_t *tmp =  new uint32_t[alphabet_size];
+	memcpy(tmp, num_elem, sizeof(uint32_t) * alphabet_size);
 
 	return tmp;
 }

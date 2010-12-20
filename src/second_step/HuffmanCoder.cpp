@@ -22,7 +22,7 @@ bool compareNodes(Node* n1, Node* n2){
 }
 
 HuffmanCoder::HuffmanCoder():
-	tree(NULL){
+	tree(NULL), data_size(0){
 }
 
 HuffmanCoder::~HuffmanCoder() {
@@ -88,10 +88,12 @@ int HuffmanCoder::encodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_siz
 		}
 	}
 
+	data_size = out_pos + 1;
+
 	return (out_pos  - 3 * count) * 8 - bits_left;
 }
 
-void HuffmanCoder::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size){
+int HuffmanCoder::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size){
 
 	uint8_t mask;
 	int c = 0;
@@ -102,6 +104,7 @@ void HuffmanCoder::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_si
 	init();
 
 	int count = in_buf[0];
+	cout << "Count = " << count << endl;
 
 	for(int i = 0; i < count; ++i){
 		alphabet_weights[in_buf[3*i + 1]] = in_buf[3*i + 2];
@@ -129,6 +132,12 @@ void HuffmanCoder::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_si
 		}
 	}
 
+	return out_pos;
+
+}
+
+int HuffmanCoder::getData_size(){
+	return data_size;
 }
 
 int HuffmanCoder::findCharacter(int c, int bits_num){

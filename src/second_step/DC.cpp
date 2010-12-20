@@ -21,7 +21,7 @@ DC::DC(){//:SecondStepAlg() {
 DC::~DC() {
 }
 
-void DC::encodeBuf(const uint8_t* in_buf, unsigned int* out_buf, int buf_size){
+int DC::encodeBuf(const uint8_t* in_buf, uint32_t* out_buf, int buf_size){
 
 //	out_buf = new uint8_t[buf_size];
 //	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
@@ -54,14 +54,18 @@ void DC::encodeBuf(const uint8_t* in_buf, unsigned int* out_buf, int buf_size){
 		}
 	}
 	out_buf[buf_size] = count;
+
+	return out_pos;
 }
 
-void DC::decodeBuf(const unsigned int* in_buf, uint8_t* out_buf, int buf_size){
+void DC::decodeBuf(const uint32_t* in_buf, uint8_t* out_buf, int buf_size){
 
 	int j;
 	int tmp;
 //	out_buf = new uint8_t[buf_size];
 //	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
+
+	init();
 
 	int count = in_buf[buf_size];
 	int in_pos = buf_size + 1;
