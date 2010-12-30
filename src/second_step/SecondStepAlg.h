@@ -25,6 +25,15 @@ private:
 
 };
 
+typedef struct _coderData{
+	uint8_t* in_buf;
+	uint8_t* out_buf;
+
+	int data_size;
+	int ret_size;
+
+}coderData;
+
 }//namespace SecondStepAlgs
 
 

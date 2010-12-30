@@ -63,7 +63,7 @@ private:
 	/*!
 	 * Method used to generate starting alphabet
 	 */
-	void init();
+	void init(bool vector_init = true);
 	/*!
 	 * Method incrementing first elem element of actual_dist array
 	 * \elem - number of elements to increment
