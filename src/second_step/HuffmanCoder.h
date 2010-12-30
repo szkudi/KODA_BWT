@@ -74,7 +74,7 @@ private:
 	 */
 	void tree2arrays(Node *tree, int level, int num, bool right);
 
-	int findCharacter(int c, int bits_num);
+	int findCharacter(uint32_t c, int bits_num);
 
 	void init();
 
@@ -83,8 +83,8 @@ private:
 	static const int alphabet_size = 256;
 
 	///Array containing used alphabet_weights
-	int alphabet_weights[alphabet_size];
-	int num_of_bits[alphabet_size];
+	uint32_t alphabet_weights[alphabet_size];
+	int32_t num_of_bits[alphabet_size];
 
 	int data_size;
 };
