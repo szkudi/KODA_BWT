@@ -73,12 +73,86 @@ void RLE_2::decodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
 			out_buf[output_index++] = run_symbol;
 			first = true;
 		} else if(in_buf[i] == run_symbol){
-			for(int j = 0; j < RLE_buffer[rle_index] - 1; j++)
+			for(unsigned int j = 0; j < RLE_buffer[rle_index] - 1; j++)
 				out_buf[output_index++] = run_symbol;
 			rle_index++;
 			first = false;
 		} else{
 			run_symbol = in_buf[i];
+		}
+
+	}
+
+}
+
+void RLE_2::encodeBuf(coderData* data){
+	int run_start_index = 0;
+	uint8_t run_symbol = 0xFF; //should be -1, but uint8_t can't handle it :)
+	output_index = 0;
+
+	bool first = true;
+
+	data->out_buf = new uint8_t[data->in_size + 2 * sizeof(uint32_t)];
+	(reinterpret_cast<uint32_t*>(data->out_buf))[0] = data->in_size;
+
+	uint8_t* out = data->out_buf + 2 * sizeof(uint32_t);
+
+	int run_length;
+
+	for(unsigned int i = 0; i < data->in_size; ++i){
+		if(!first && data->in_buf[i] == run_symbol){
+			run_length = i - run_start_index + 1;
+			if(run_length <= 2)
+				out[output_index++] = run_symbol;
+		}else{
+			run_length = i - run_start_index;
+			if(run_length >= 2){
+				RLE_buffer.push_back(run_length);
+			}
+
+			out[output_index++] = data->in_buf[i];
+			run_symbol = data->in_buf[i];
+			run_start_index = i;
+
+			first = false;
+		}
+	}
+
+	run_length = data->in_size - run_start_index;
+	if(run_length >= 2){
+		RLE_buffer.push_back(run_length);
+	}
+
+	data->out_size = output_index + sizeof(uint32_t);
+	(reinterpret_cast<uint32_t*>(data->out_buf))[1] = output_index;
+}
+
+void RLE_2::decodeBuf(coderData* data){
+
+	uint8_t run_symbol;
+	int output_index = 0;
+	int rle_index = 0;
+
+	bool first = false;
+
+	data->out_size = (reinterpret_cast<uint32_t*>(data->in_buf))[0];
+	data->in_size = (reinterpret_cast<uint32_t*>(data->in_buf))[1];
+	data->out_buf = new uint8_t[data->out_size];
+
+	uint8_t* in = data->in_buf + 2 * sizeof(uint32_t);
+
+	for(unsigned int i = 0; i < data->in_size; ++i){
+		if(!first){
+			run_symbol = in[i];
+			data->out_buf[output_index++] = run_symbol;
+			first = true;
+		} else if(in[i] == run_symbol){
+			for(unsigned int j = 0; j < RLE_buffer[rle_index] - 1; j++)
+				data->out_buf[output_index++] = run_symbol;
+			rle_index++;
+			first = false;
+		} else{
+			run_symbol = in[i];
 		}
 
 	}

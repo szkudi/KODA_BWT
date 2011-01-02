@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include <cstdlib>
+#include "SecondStepAlg.h"
 
 namespace SecondStepAlgs {
 
@@ -35,6 +36,7 @@ public:
 	 * \return Return number of bits in output. Encoded data is returned via pointer given to method
 	 */
 	int encodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
+	void encodeBuf(coderData* data);
 	/*!
 	 * Method used to decode given encoded data
 	 *
@@ -45,6 +47,8 @@ public:
 	 * \return Decoded data is returned via pointer given to method
 	 */
 	int decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
+	void decodeBuf(coderData* data);
+
 
 	int* getAlphabet();
 	void setAlphabet(int* alphabet);
@@ -87,6 +91,7 @@ private:
 	int32_t num_of_bits[alphabet_size];
 
 	int data_size;
+	int used_alph_size;
 };
 
 class Node {
