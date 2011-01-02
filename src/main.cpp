@@ -24,6 +24,7 @@
 #include "second_step/IFC.h"
 #include "second_step/RLE.h"
 #include "second_step/HuffmanCoder.h"
+#include "second_step/ArthmeticCoder.h"
 
 using namespace std;
 const static int alphabet_size = 256;
@@ -483,6 +484,7 @@ int main(int argc, char** argv) {
 		SecondStepAlgs::DC dc;
 		SecondStepAlgs::IFC ifc;
 		SecondStepAlgs::IF invfreq;
+		SecondStepAlgs::ArthmeticCoder ac;
 
 		SecondStepAlgs::coderData cd;
 
@@ -494,7 +496,7 @@ int main(int argc, char** argv) {
 //		mtf.encodeBuf(&cd);
 //
 
-		invfreq.encodeBuf(&cd);
+//		invfreq.encodeBuf(&cd);
 //		rle.encodeBuf(&cd);
 
 //		delete[] cd.in_buf;
@@ -507,7 +509,9 @@ int main(int argc, char** argv) {
 
 
 
-//		hc.encodeBuf(&cd);
+		hc.encodeBuf(&cd);
+
+//		ac.encodeBuf(&cd);
 
 		output.write((char*)cd.out_buf, cd.out_size);
 
@@ -562,6 +566,7 @@ int main(int argc, char** argv) {
 		SecondStepAlgs::DC dc;
 		SecondStepAlgs::IFC ifc;
 		SecondStepAlgs::IF invfreq;
+		SecondStepAlgs::ArthmeticCoder ac;
 
 		SecondStepAlgs::coderData cd;
 
@@ -570,13 +575,14 @@ int main(int argc, char** argv) {
 
 
 
-//		hc.decodeBuf(&cd);
+		hc.decodeBuf(&cd);
+//		ac.decodeBuf(&cd);
 
 //		delete[] cd.in_buf;
 //		cd.in_buf = cd.out_buf;
 //		cd.in_size = cd.out_size;
 
-		invfreq.decodeBuf(&cd);
+//		invfreq.decodeBuf(&cd);
 //		rle.decodeBuf(&cd);
 
 //		ifc.decodeBuf(&cd);
