@@ -26,12 +26,16 @@ private:
 };
 
 typedef struct _coderData{
+	//Data buffers sizes
+	uint32_t in_size;
+	uint32_t out_size;
+
+	//Data buffers
 	uint8_t* in_buf;
 	uint8_t* out_buf;
 
-	int data_size;
-	int ret_size;
-
+	//Additional variable for each coder use
+	int var_1, var_2;
 }coderData;
 
 }//namespace SecondStepAlgs

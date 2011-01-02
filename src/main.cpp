@@ -477,72 +477,153 @@ int main(int argc, char** argv) {
 		buf_1 = new uint8_t[data_size];
 		input.read(reinterpret_cast<char *>(buf_1), data_size);
 
-		switch(alg_type){
-			case 1:
-				// "RLE-2 + IFC + Huffman Coding"
-				buf_2 = doRLE2andIFCandHCencode(buf_1, data_size);
-				break;
-			case 2:
-				// "RLE-0 + IFC + Huffman Coding"
-				buf_2 = doRLEencode(buf_1, data_size);
+		SecondStepAlgs::MTF mtf;
+		SecondStepAlgs::HuffmanCoder hc;
+		SecondStepAlgs::RLE rle;
+		SecondStepAlgs::DC dc;
+		SecondStepAlgs::IFC ifc;
+		SecondStepAlgs::IF invfreq;
 
-				break;
-			case 3:
-				cout << "IFC + Huffman Coding" << endl;
-				break;
-			case 4:
-				cout << "DC + RLE + Huffman Coding" << endl;
-				break;
-			case 5:
-				cout << "DC + Huffman Coding" << endl;
-				break;
-			case 6:
-				cout << "IF + RLE + Huffman Coding" << endl;
-				break;
-			case 7:
-				cout << "IF + Huffman Coding" << endl;
-				break;
-			case 8:
-				cout << "MTF + RLE + Huffman Coding" << endl;
-				break;
-			case 9:
-				cout << "MTF + Huffman Coding" << endl;
-				break;
-		}
+		SecondStepAlgs::coderData cd;
 
-		delete[] buf_1;
+		cd.in_buf = buf_1;
+		cd.in_size = data_size;
+
+//		ifc.encodeBuf(&cd);
+//		dc.encodeBuf(&cd);
+//		mtf.encodeBuf(&cd);
+//
+
+		invfreq.encodeBuf(&cd);
+//		rle.encodeBuf(&cd);
+
+//		delete[] cd.in_buf;
+//		cd.in_buf = cd.out_buf;
+//		cd.in_size = cd.out_size;
+
+//		delete[] cd.in_buf;
+//		cd.in_buf = cd.out_buf;
+//		cd.in_size = cd.out_size;
+
+
+
+//		hc.encodeBuf(&cd);
+
+		output.write((char*)cd.out_buf, cd.out_size);
+
+//		delete[] cd.in_buf;
+//		delete[] cd.out_buf;
+
+
+//		switch(alg_type){
+//			case 1:
+//				// "RLE-2 + IFC + Huffman Coding"
+//				buf_2 = doRLE2andIFCandHCencode(buf_1, data_size);
+//				break;
+//			case 2:
+//				// "RLE-0 + IFC + Huffman Coding"
+//				buf_2 = doRLEencode(buf_1, data_size);
+//
+//				break;
+//			case 3:
+//				cout << "IFC + Huffman Coding" << endl;
+//				break;
+//			case 4:
+//				cout << "DC + RLE + Huffman Coding" << endl;
+//				break;
+//			case 5:
+//				cout << "DC + Huffman Coding" << endl;
+//				break;
+//			case 6:
+//				cout << "IF + RLE + Huffman Coding" << endl;
+//				break;
+//			case 7:
+//				cout << "IF + Huffman Coding" << endl;
+//				break;
+//			case 8:
+//				cout << "MTF + RLE + Huffman Coding" << endl;
+//				break;
+//			case 9:
+//				cout << "MTF + Huffman Coding" << endl;
+//				break;
+//		}
+
+//		delete[] buf_1;
 	}
 
 	if(decoding){
-		switch(alg_type){
-			case 1:
-				cout << "RLE-2 + IFC + Huffman Coding" << endl;
-				break;
-			case 2:
-				cout << "RLE-0 + IFC + Huffman Coding" << endl;
-				break;
-			case 3:
-				cout << "IFC + Huffman Coding" << endl;
-				break;
-			case 4:
-				cout << "DC + RLE + Huffman Coding" << endl;
-				break;
-			case 5:
-				cout << "DC + Huffman Coding" << endl;
-				break;
-			case 6:
-				cout << "IF + RLE + Huffman Coding" << endl;
-				break;
-			case 7:
-				cout << "IF + Huffman Coding" << endl;
-				break;
-			case 8:
-				cout << "MTF + RLE + Huffman Coding" << endl;
-				break;
-			case 9:
-				cout << "MTF + Huffman Coding" << endl;
-				break;
-		}
+
+		buf_1 = new uint8_t[data_size];
+		input.read(reinterpret_cast<char *>(buf_1), data_size);
+
+		SecondStepAlgs::MTF mtf;
+		SecondStepAlgs::HuffmanCoder hc;
+		SecondStepAlgs::RLE rle;
+		SecondStepAlgs::DC dc;
+		SecondStepAlgs::IFC ifc;
+		SecondStepAlgs::IF invfreq;
+
+		SecondStepAlgs::coderData cd;
+
+		cd.in_buf = buf_1;
+		cd.in_size = data_size;
+
+
+
+//		hc.decodeBuf(&cd);
+
+//		delete[] cd.in_buf;
+//		cd.in_buf = cd.out_buf;
+//		cd.in_size = cd.out_size;
+
+		invfreq.decodeBuf(&cd);
+//		rle.decodeBuf(&cd);
+
+//		ifc.decodeBuf(&cd);
+//		dc.decodeBuf(&cd);
+//
+//		delete[] cd.in_buf;
+//		cd.in_buf = cd.out_buf;
+//		cd.in_size = cd.out_size;
+//
+//		mtf.decodeBuf(&cd);
+
+		output.write((char*)cd.out_buf, cd.out_size);
+
+//		delete[] cd.in_buf;
+//		delete[] cd.out_buf;
+
+//		delete[] buf_1;
+
+//		switch(alg_type){
+//			case 1:
+//				cout << "RLE-2 + IFC + Huffman Coding" << endl;
+//				break;
+//			case 2:
+//				cout << "RLE-0 + IFC + Huffman Coding" << endl;
+//				break;
+//			case 3:
+//				cout << "IFC + Huffman Coding" << endl;
+//				break;
+//			case 4:
+//				cout << "DC + RLE + Huffman Coding" << endl;
+//				break;
+//			case 5:
+//				cout << "DC + Huffman Coding" << endl;
+//				break;
+//			case 6:
+//				cout << "IF + RLE + Huffman Coding" << endl;
+//				break;
+//			case 7:
+//				cout << "IF + Huffman Coding" << endl;
+//				break;
+//			case 8:
+//				cout << "MTF + RLE + Huffman Coding" << endl;
+//				break;
+//			case 9:
+//				cout << "MTF + Huffman Coding" << endl;
+//				break;
+//		}
 	}
 
 	return EXIT_SUCCESS;

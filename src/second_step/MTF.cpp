@@ -63,4 +63,44 @@ void MTF::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size){
     }
 }
 
+void MTF::encodeBuf(coderData* data){
+
+	init();
+
+	data->out_size = data->in_size + sizeof(uint32_t);
+	data->out_buf = new uint8_t[data->out_size];
+
+	uint8_t* out = data->out_buf + sizeof(uint32_t);
+
+	(reinterpret_cast<uint32_t*>(data->out_buf))[0] = data->in_size;
+
+    for (unsigned int i = 0; i < data->in_size; ++i) {
+    	out[i] = alphabet[data->in_buf[i]];
+        for (int j = 0; j < alphabet_size; ++j)
+            if (alphabet[j] < alphabet[data->in_buf[i]])
+                ++alphabet[j];
+        alphabet[data->in_buf[i]] = 0;
+    }
+}
+
+void MTF::decodeBuf(coderData* data){
+
+    uint8_t tmp;
+
+    init();
+
+    data->out_size = (reinterpret_cast<uint32_t*>(data->in_buf))[0];
+    data->out_buf = new uint8_t[data->out_size];
+
+    uint8_t* in = data->in_buf + sizeof(uint32_t);
+
+    for (unsigned int i = 0; i < data->out_size; ++i) {
+    	data->out_buf[i] = alphabet[in[i]];
+        tmp = alphabet[in[i]];
+        for (int j = in[i]; j ; --j)
+        	alphabet[j] = alphabet[j-1];
+        alphabet[0] = tmp;
+    }
+}
+
 }//namespace SecondStepAlgs

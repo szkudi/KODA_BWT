@@ -10,6 +10,7 @@
 #define RLE_H_
 
 #include <stdint.h>
+#include "SecondStepAlg.h"
 
 namespace SecondStepAlgs {
 
@@ -34,6 +35,7 @@ public:
 	 * \return Return length of encoded data. Encoded data is returned via pointer given to method
 	 */
 	int encodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
+	void encodeBuf(coderData* data);
 	/*!
 	 * Method used to decode given encoded data
 	 *
@@ -44,6 +46,7 @@ public:
 	 * \return Decoded data is returned via pointer given to method
 	 */
 	void decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size);
+	void decodeBuf(coderData* data);
 
 	int getResizeLength(const uint8_t* in_buf, int buf_size);
 };
