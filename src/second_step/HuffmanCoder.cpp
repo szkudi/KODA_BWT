@@ -137,6 +137,7 @@ void HuffmanCoder::encodeBuf(coderData* data){
 	uint8_t bits_left = 8;
 	int tmp_bits = 0;
 	int count = 0;
+	int bits = 0;
 
 	init();
 
@@ -156,54 +157,126 @@ void HuffmanCoder::encodeBuf(coderData* data){
 			(reinterpret_cast<uint32_t*>(out + out_pos))[0] = alphabet_weights[i];
 			out_pos += sizeof(uint32_t);
 			out[out_pos++] = num_of_bits[i];
+//			cout << (char)i << " wartosc = " << alphabet_weights[i] << " bitow = " << num_of_bits[i] << endl;;
 		}
 	}
 	out[0] = count;
 
+	uint32_t* out32 = reinterpret_cast<uint32_t*>(out + out_pos);
+
+	bits_left = 32;
+	int out32_pos = 0;
 	for(unsigned int i = 0; i < data->in_size; ++i){
-//		cout << "Znak nr = " << i << " bitów = " << num_of_bits[data->in_buf[i]] << endl;
-//		if(i == 105 + sizeof(uint32_t))
-//			cout <<  "bitów = " << num_of_bits[data->in_buf[i]] << " znak = " <<  (int)data->in_buf[i] << " bits_left = " << (int)bits_left << endl;
+		bits += num_of_bits[data->in_buf[i]];
 		if(num_of_bits[data->in_buf[i]] < bits_left){
-			out[out_pos] |= ((alphabet_weights[data->in_buf[i]] << (bits_left - num_of_bits[data->in_buf[i]])) & 0xFF);
+			out32[out32_pos] |= alphabet_weights[data->in_buf[i]] << (bits_left - num_of_bits[data->in_buf[i]]);
+//			cout << i << " Less" << " bits " << num_of_bits[data->in_buf[i]]  << " char " <<  alphabet_weights[data->in_buf[i]] <<  " out " << out32[out32_pos] <<  endl;
 			bits_left -= num_of_bits[data->in_buf[i]];
 		}else{
 			tmp_bits = num_of_bits[data->in_buf[i]] - bits_left;
-			out[out_pos] |= ((alphabet_weights[data->in_buf[i]] >> tmp_bits) & 0xFF);
-			out_pos++;
-//			out[out_pos] = 0;
-			bits_left = 8;
-			for(int j = 0; j < ceil((1.0*tmp_bits)/8); ++j){
-				if(tmp_bits < bits_left){
-					out[out_pos] |= ((alphabet_weights[data->in_buf[i]] << (bits_left - tmp_bits)) & 0xFF);//num_of_bits[in_buf[i]])) & 0xFF);
-					bits_left -= tmp_bits;
-				}else{
-					tmp_bits -= 8;
-					out[out_pos] |= ((alphabet_weights[data->in_buf[i]] >> tmp_bits) & 0xFF);
-					out_pos++;
-//					out[out_pos] = 0;
-				}
+			out32[out32_pos] |= alphabet_weights[data->in_buf[i]] >> tmp_bits;
+
+//			cout << i << " Else" << " bits " << num_of_bits[data->in_buf[i]]  << " tmp_bits " << tmp_bits << " char " <<  alphabet_weights[data->in_buf[i]] << " out " << out32[out32_pos] << endl;
+
+			out32_pos++;
+			bits_left = 32;
+
+			if(tmp_bits){
+				out32[out32_pos] |= alphabet_weights[data->in_buf[i]] << (bits_left - tmp_bits);
+				bits_left -= tmp_bits;
 			}
 		}
-//		if(i == 105 + sizeof(uint32_t))
-//			cout << "wpisany znak = " << alphabet_weights[data->in_buf[i]] << " bits_left = " << (int)bits_left << " " << (int)out[out_pos] << " bajt " << out_pos  << endl;
 	}
 
-	if(bits_left != 8)
-		data->out_size = out_pos + 1 + 2 * sizeof(uint32_t);
-	else
-		data->out_size = out_pos + 2 * sizeof(uint32_t);
+	cout << bits << endl;
 
+//	out[out_pos] = 0;
+//	for(unsigned int i = 0; i < data->in_size; ++i){
+//		bits += num_of_bits[data->in_buf[i]];
+//		if(num_of_bits[data->in_buf[i]] < bits_left){
+//			out[out_pos] += (uint32_t)(alphabet_weights[data->in_buf[i]] * pow(2, bits_left - num_of_bits[data->in_buf[i]])) % 256;
+//			bits_left -= num_of_bits[data->in_buf[i]];
+//		}else{
+//			tmp_bits = num_of_bits[data->in_buf[i]] - bits_left;
+//			out[out_pos] +=  (uint32_t)(alphabet_weights[data->in_buf[i]] / pow(2, tmp_bits)) % 256;
+//			out_pos++;
+////			out[out_pos] = 0;
+//			bits_left = 8;
+//			for(int j = 0; j < ceil(1.0*tmp_bits/8); ++j){
+//				if(tmp_bits > bits_left){
+//					tmp_bits -= bits_left;
+//					out[out_pos] +=  (uint32_t)(alphabet_weights[data->in_buf[i]] / pow(2, tmp_bits)) % 256;
+//					out_pos++;
+////					out[out_pos] = 0;
+//				}else{
+//					out[out_pos] +=  (uint32_t)(alphabet_weights[data->in_buf[i]] * pow(2, bits_left - tmp_bits)) % 256;
+//					bits_left -= tmp_bits;
+//				}
+//			}
+//		}
+//	}
 
-	data->var_1 = (out_pos  - 2 * count - sizeof(uint32_t) * count) * 8 - bits_left;
+//	if(bits_left != 8)
+//		data->out_size = out_pos + 1 + 2 * sizeof(uint32_t);
+//	else
+//		data->out_size = out_pos + 2 * sizeof(uint32_t);
+
+	data->out_size = out_pos + (out32_pos + 3) * sizeof(uint32_t);
+
+	data->var_1 = bits;//(out_pos - 2 * count - sizeof(uint32_t) * count) * 8 - bits_left;
+//	cout << bits << " " << data->var_1 << endl;
 
 	(reinterpret_cast<uint32_t*>(data->out_buf))[0] = data->in_size; //Remember original input size
 	(reinterpret_cast<uint32_t*>(data->out_buf))[1] = data->var_1; //Remember number of bits in output
+
+
+
+
+//	for(unsigned int i = 0; i < data->in_size; ++i){
+////		cout << "Znak nr = " << i << " bitów = " << num_of_bits[data->in_buf[i]] << endl;
+////		if(i == 105 + sizeof(uint32_t))
+////			cout <<  "bitów = " << num_of_bits[data->in_buf[i]] << " znak = " <<  (int)data->in_buf[i] << " bits_left = " << (int)bits_left << endl;
+//		if(num_of_bits[data->in_buf[i]] < bits_left){
+//			out[out_pos] |= ((alphabet_weights[data->in_buf[i]] << (bits_left - num_of_bits[data->in_buf[i]])) & 0xFF);
+//			bits_left -= num_of_bits[data->in_buf[i]];
+//		}else{
+//			tmp_bits = num_of_bits[data->in_buf[i]] - bits_left;
+//			out[out_pos] |= ((alphabet_weights[data->in_buf[i]] >> tmp_bits) & 0xFF);
+//			out_pos++;
+////			out[out_pos] = 0;
+//			bits_left = 8;
+//			for(int j = 0; j < ceil((1.0*tmp_bits)/8); ++j){
+//				if(tmp_bits < bits_left){
+//					out[out_pos] |= ((alphabet_weights[data->in_buf[i]] << (bits_left - tmp_bits)) & 0xFF);//num_of_bits[in_buf[i]])) & 0xFF);
+//					bits_left -= tmp_bits;
+//				}else{
+//					tmp_bits -= 8;
+//					out[out_pos] |= ((alphabet_weights[data->in_buf[i]] >> tmp_bits) & 0xFF);
+//					out_pos++;
+////					out[out_pos] = 0;
+//				}
+//			}
+//		}
+////		if(i == 105 + sizeof(uint32_t))
+////			cout << "wpisany znak = " << alphabet_weights[data->in_buf[i]] << " bits_left = " << (int)bits_left << " " << (int)out[out_pos] << " bajt " << out_pos  << endl;
+//	}
+//
+//	if(bits_left != 8)
+//		data->out_size = out_pos + 1 + 2 * sizeof(uint32_t);
+//	else
+//		data->out_size = out_pos + 2 * sizeof(uint32_t);
+//
+//
+//	data->var_1 = (out_pos  - 2 * count - sizeof(uint32_t) * count) * 8 - bits_left;
+//
+//	(reinterpret_cast<uint32_t*>(data->out_buf))[0] = data->in_size; //Remember original input size
+//	(reinterpret_cast<uint32_t*>(data->out_buf))[1] = data->var_1; //Remember number of bits in output
 }
 
 void HuffmanCoder::decodeBuf(coderData* data){
 
-	uint8_t mask;
+//	uint8_t mask;
+	uint32_t mask;
 	uint32_t c = 0;
 	int out_pos = 0;
 	int in_pos = 0;
@@ -217,6 +290,8 @@ void HuffmanCoder::decodeBuf(coderData* data){
 	data->out_size = (reinterpret_cast<uint32_t*>(data->in_buf))[0];
 	data->var_1 = (reinterpret_cast<uint32_t*>(data->in_buf))[1];
 
+//	cout << data->var_1 << endl;
+
 	data->out_buf = new uint8_t[data->out_size];
 
 	int count = in[in_pos++];
@@ -226,27 +301,48 @@ void HuffmanCoder::decodeBuf(coderData* data){
 		alphabet_weights[tmp] = (reinterpret_cast<const uint32_t*>(in + in_pos))[0];
 		in_pos += sizeof(uint32_t);
 		num_of_bits[tmp] = in[in_pos++];
-		cout <<(char)tmp << " wartosc = " <<  alphabet_weights[tmp] << " bitow " << num_of_bits[tmp] << endl;
+//		cout <<(char)tmp << " wartosc = " <<  alphabet_weights[tmp] << " bitow " << num_of_bits[tmp] << endl;
 	}
 
+	uint32_t* in32 = reinterpret_cast<uint32_t*>(in + in_pos);
+
 	for(int i = 0; i < data->var_1; ++i){
-		tmp = 0;
-		mask = 1 << (7 - i%8);
-		c = c << 1;
+//		mask = 1 << (7 - i % 8);
+		mask = 1 << (31 - i % 32);
+		c <<= 1;
+//		if((mask & in[in_pos + i/8]) != 0)
+		if((mask & in32[i/32]) != 0)
+			c += 1;
 		bits_num++;
-		c += (in[in_pos + i/8] & mask) != 0?1:0;
-//		cout << "Mask = " << (int)mask  << " c = " << c << endl;
 		tmp = findCharacter(c, bits_num);
 		if(tmp != -1){
 //			cout << "Znak nr = " << out_pos << " bitow = " << bits_num << " znak = " << tmp << endl;
-			data->out_buf[out_pos++] = (uint8_t)tmp;
+			data->out_buf[out_pos++] = tmp;
 			c = 0;
 			bits_num = 0;
 		}
-//		if(in_pos + i/8 == 503)
-//			cout << "bajt = " << (int)in[in_pos + i/8] <<  " maska = " << (int)mask << " bits_num = " << bits_num << " c = " << (int)c << " tmp = " << tmp << endl;
-
 	}
+
+
+
+//	for(int i = 0; i < data->var_1; ++i){
+//		tmp = 0;
+//		mask = 1 << (7 - i%8);
+//		c = c << 1;
+//		bits_num++;
+//		c += (in[in_pos + i/8] & mask) != 0?1:0;
+////		cout << "Mask = " << (int)mask  << " c = " << c << endl;
+//		tmp = findCharacter(c, bits_num);
+//		if(tmp != -1){
+////			cout << "Znak nr = " << out_pos << " bitow = " << bits_num << " znak = " << tmp << endl;
+//			data->out_buf[out_pos++] = (uint8_t)tmp;
+//			c = 0;
+//			bits_num = 0;
+//		}
+////		if(in_pos + i/8 == 503)
+////			cout << "bajt = " << (int)in[in_pos + i/8] <<  " maska = " << (int)mask << " bits_num = " << bits_num << " c = " << (int)c << " tmp = " << tmp << endl;
+//
+//	}
 }
 
 
