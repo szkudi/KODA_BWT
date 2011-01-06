@@ -80,6 +80,10 @@ private:
 
 	int findCharacter(uint32_t c, int bits_num);
 
+	uint32_t generateMask(int size);
+
+	uint16_t getBitsFromBuffer(uint32_t buff, int bits);
+
 	void init();
 
 	Node* tree;

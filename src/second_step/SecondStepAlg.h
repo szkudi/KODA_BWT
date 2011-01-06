@@ -35,7 +35,7 @@ typedef struct _coderData{
 	uint8_t* out_buf;
 
 	//Additional variable for each coder use
-	int var_1, var_2;
+	uint32_t var_1, var_2;
 }coderData;
 
 }//namespace SecondStepAlgs
