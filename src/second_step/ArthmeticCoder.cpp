@@ -116,7 +116,11 @@ void ArthmeticCoder::decodeBuf(coderData *data){
 		buf_pos += sizeof(uint32_t);
 	}
 
-	setupLimits(1);
+	setupLimits(data->out_size);
+
+//	for(unsigned int i = 0; i < alphabet.size(); ++i){
+//		cout << "gora = " << alphabet[i].gora << " dol = " << alphabet[i].dol << endl;
+//	}
 
 	buf_pos += ceil(1.0*bits/8);
 	maska = 1 << (7 - bits % 8);
@@ -137,6 +141,8 @@ void ArthmeticCoder::decodeBuf(coderData *data){
 		przedzial = (uint64_t)(gora - dol) + 1;
 		dol = dol + przedzial*alphabet[idx].dol;
 		gora = dol + przedzial*alphabet[idx].gora;
+
+		cout << i << " l_kod = " << l_kod << " gora = " << gora << " dol = " << dol << " przedzial = " << przedzial << " idx = " << idx << endl;
 
 		while(true){
 			if((gora & 0x80000000) == (dol & 0x80000000)){
