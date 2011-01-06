@@ -644,7 +644,7 @@ int main(int argc, char** argv) {
 		uint8_t* buf_2 = new uint8_t[size2];
 		memset(buf_2, 0 , sizeof(uint8_t) * size2);
 
-		decoder->decode(reinterpret_cast<unsigned char*>(cd.out_buf) + sizeof(uint32_t), buf_2, data_size);
+		decoder->decode(reinterpret_cast<unsigned char*>(cd.out_buf) + sizeof(uint32_t), buf_2, size2 + ceil(size2/block_size)*sizeof(int));
 
 		output.write((char*)buf_2, size2);
 
