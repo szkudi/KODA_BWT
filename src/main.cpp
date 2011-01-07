@@ -526,7 +526,7 @@ int main(int argc, char** argv) {
 				// "DC + RLE + Huffman Coding";
 				dc->encodeBuf(&cd);
 
-				delete[] cd.in_buf;
+//				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -540,7 +540,7 @@ int main(int argc, char** argv) {
 				// "IF + RLE + Huffman Coding"
 				invfreq->encodeBuf(&cd);
 
-				delete[] cd.in_buf;
+//				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -554,7 +554,7 @@ int main(int argc, char** argv) {
 				// "MTF + RLE + Huffman Coding"
 				mtf->encodeBuf(&cd);
 
-				delete[] cd.in_buf;
+//				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -566,7 +566,7 @@ int main(int argc, char** argv) {
 				break;
 		}
 
-		delete[] cd.in_buf;
+//		delete[] cd.in_buf;
 		cd.in_buf = cd.out_buf;
 		cd.in_size = cd.out_size;
 
@@ -574,11 +574,11 @@ int main(int argc, char** argv) {
 
 		output.write((char*)cd.out_buf, cd.out_size);
 
-		delete[] cd.in_buf;
-		cd.in_buf = NULL;
-		delete[] cd.out_buf;
-		cd.out_buf = NULL;
-		delete[] buf_1;
+//		delete[] cd.in_buf;
+//		cd.in_buf = NULL;
+//		delete[] cd.out_buf;
+//		cd.out_buf = NULL;
+//		delete[] buf_1;
 	}
 
 	if(decoding){
@@ -592,7 +592,7 @@ int main(int argc, char** argv) {
 
 		hc.decodeBuf(&cd);
 
-		delete[] cd.in_buf;
+//		delete[] cd.in_buf;
 		cd.in_buf = cd.out_buf;
 		cd.in_size = cd.out_size;
 
@@ -610,7 +610,7 @@ int main(int argc, char** argv) {
 				// "DC + RLE + Huffman Coding";
 				rle->decodeBuf(&cd);
 
-				delete[] cd.in_buf;
+//				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -624,7 +624,7 @@ int main(int argc, char** argv) {
 				// "IF + RLE + Huffman Coding"
 				rle->decodeBuf(&cd);
 
-				delete[] cd.in_buf;
+//				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -638,7 +638,7 @@ int main(int argc, char** argv) {
 				// "MTF + RLE + Huffman Coding"
 				rle->decodeBuf(&cd);
 
-				delete[] cd.in_buf;
+//				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -665,9 +665,9 @@ int main(int argc, char** argv) {
 
 		output.write((char*)buf_2, size2);
 
-		delete[] cd.in_buf;
-		delete[] cd.out_buf;
-		delete[] buf_2;
+//		delete[] cd.in_buf;
+//		delete[] cd.out_buf;
+//		delete[] buf_2;
 	}
 
 	return EXIT_SUCCESS;
