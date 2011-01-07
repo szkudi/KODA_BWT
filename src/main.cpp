@@ -495,13 +495,20 @@ int main(int argc, char** argv) {
 		buf_1 = new uint8_t[data_size];
 		input.read(reinterpret_cast<char *>(buf_1), data_size);
 
-		int size2 = data_size + ceil(data_size/block_size)*sizeof(int) + sizeof(uint32_t);
+		//int size2= data_size + ceil(data_size/block_size)*sizeof(int) + sizeof(uint32_t);
+                int size2;
+                if(data_size%block_size!=0)
+                    size2 = data_size+(static_cast<int>(data_size/block_size)+1)*sizeof(int);
+                else
+                    size2 = data_size+static_cast<int>(data_size/block_size)*sizeof(int);
+
+                size2+=sizeof(uint32_t);
+
 		cd.in_buf = new uint8_t[size2];
 		memset(cd.in_buf, 0 , sizeof(uint8_t) * size2);
 		(reinterpret_cast<uint32_t*>(cd.in_buf))[0] = data_size;
 		encoder->code(reinterpret_cast<unsigned char*>(buf_1), cd.in_buf + sizeof(uint32_t), data_size);
-
-		cd.in_buf = buf_1;
+		//cd.in_buf = buf_1;
 		cd.in_size = size2;
 
 		switch(alg_type){
@@ -641,10 +648,17 @@ int main(int argc, char** argv) {
 		}
 
 		int size2 = (reinterpret_cast<uint32_t*>(cd.out_buf))[0];
+
+                int codedSize;
+                if(size2%block_size!=0)
+                    codedSize = size2+(static_cast<int>(size2/block_size)+1)*sizeof(int);
+                else
+                    codedSize = size2+static_cast<int>(size2/block_size)*sizeof(int);
+
 		uint8_t* buf_2 = new uint8_t[size2];
 		memset(buf_2, 0 , sizeof(uint8_t) * size2);
 
-		decoder->decode(reinterpret_cast<unsigned char*>(cd.out_buf) + sizeof(uint32_t), buf_2, size2 + ceil(size2/block_size)*sizeof(int));
+		decoder->decode(reinterpret_cast<unsigned char*>(cd.out_buf + sizeof(uint32_t)), buf_2, codedSize);
 
 		output.write((char*)buf_2, size2);
 
