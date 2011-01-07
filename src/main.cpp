@@ -1,8 +1,8 @@
 /* 
  * File:   main.cpp
- * Author: JM
+ * Author: Kacper Szkudlarek
  *
- * Created on 22 listopad 2010, 17:59
+ * Created on 22 grudnia 2010, 13:51
  */
 
 #include <iostream>
@@ -45,9 +45,9 @@ void printHelp(void) {
 	cout << "o <filename> -- output file" << endl;
 	cout << "s <size> -- BWT block size" << endl;
 	cout << "v -- verbose mode" << endl;
-	cout << "1 -- RLE-2 + IFC + Huffman Coding" << endl;
-	cout << "2 -- RLE-0 + IFC + Huffman Coding" << endl;
-	cout << "3 -- IFC + Huffman Coding" << endl;
+//	cout << "1 -- RLE-2 + IFC + Huffman Coding" << endl;
+//	cout << "2 -- RLE-0 + IFC + Huffman Coding" << endl;
+//	cout << "3 -- IFC + Huffman Coding" << endl;
 	cout << "4 -- DC + RLE + Huffman Coding" << endl;
 	cout << "5 -- DC + Huffman Coding" << endl;
 	cout << "6 -- IF + RLE + Huffman Coding" << endl;
@@ -306,13 +306,19 @@ int main(int argc, char** argv) {
 	bool verbose = false;
 	bool decoding = false, encoding = false;
 	int alg_type = 0;
-	int data_size = 0;
-	int output_size = 0;
+	int32_t data_size = 0;
 	uint8_t *buf_1;
-	uint8_t *buf_2;
 
-//	BWTcoder *encoder;
-//	BWTdecoder *decoder;
+	BWTcoder *encoder;
+	BWTdecoder *decoder;
+
+	SecondStepAlgs::DC* dc;
+	SecondStepAlgs::RLE* rle;
+	SecondStepAlgs::IF* invfreq;
+	SecondStepAlgs::MTF* mtf;
+
+	SecondStepAlgs::HuffmanCoder hc;
+	SecondStepAlgs::coderData cd;
 
 	if (argc < 2) {
 		printUsage(argv[0]);
@@ -356,25 +362,34 @@ int main(int argc, char** argv) {
 		case '4':
 //			cout << "DC + RLE + Huffman Coding" << endl;
 			alg_type = 4;
+			dc = new SecondStepAlgs::DC();
+			rle = new SecondStepAlgs::RLE();
 			break;
 		case '5':
 //			cout << "DC + Huffman Coding" << endl;
+			dc = new SecondStepAlgs::DC();
 			alg_type = 5;
 			break;
 		case '6':
 //			cout << "IF + RLE + Huffman Coding" << endl;
+			invfreq = new SecondStepAlgs::IF();
+			rle = new SecondStepAlgs::RLE();
 			alg_type = 6;
 			break;
 		case '7':
 //			cout << "IF + Huffman Coding" << endl;
+			invfreq = new SecondStepAlgs::IF();
 			alg_type = 7;
 			break;
 		case '8':
 //			cout << "MTF + RLE + Huffman Coding" << endl;
+			mtf = new SecondStepAlgs::MTF();
+			rle = new SecondStepAlgs::RLE();
 			alg_type = 8;
 			break;
 		case '9':
 //			cout << "MTF + Huffman Coding" << endl;
+			mtf = new SecondStepAlgs::MTF();
 			alg_type = 9;
 			break;
 		case '?':
@@ -475,668 +490,169 @@ int main(int argc, char** argv) {
 
 
 	if(encoding){
+		encoder = new BWTcoder(block_size);
+
 		buf_1 = new uint8_t[data_size];
 		input.read(reinterpret_cast<char *>(buf_1), data_size);
 
-		SecondStepAlgs::MTF mtf;
-		SecondStepAlgs::HuffmanCoder hc;
-		SecondStepAlgs::RLE rle;
-		SecondStepAlgs::DC dc;
-		SecondStepAlgs::IFC ifc;
-		SecondStepAlgs::IF invfreq;
-		SecondStepAlgs::ArthmeticCoder ac;
-
-		SecondStepAlgs::coderData cd;
+		int size2 = data_size + ceil(data_size/block_size)*sizeof(int) + sizeof(uint32_t);
+		cd.in_buf = new uint8_t[size2];
+		memset(cd.in_buf, 0 , sizeof(uint8_t) * size2);
+		(reinterpret_cast<uint32_t*>(cd.in_buf))[0] = data_size;
+		encoder->code(reinterpret_cast<unsigned char*>(buf_1), cd.in_buf + sizeof(uint32_t), data_size);
 
 		cd.in_buf = buf_1;
-		cd.in_size = data_size;
+		cd.in_size = size2;
 
-//		ifc.encodeBuf(&cd);
-//		dc.encodeBuf(&cd);
-//		mtf.encodeBuf(&cd);
-//
+		switch(alg_type){
+			case 1:
+				// "RLE-2 + IFC + Huffman Coding"
+				break;
+			case 2:
+				// "RLE-0 + IFC + Huffman Coding"
+				break;
+			case 3:
+				// "IFC + Huffman Coding"
+				break;
+			case 4:
+				// "DC + RLE + Huffman Coding";
+				dc->encodeBuf(&cd);
 
-//		invfreq.encodeBuf(&cd);
-//		rle.encodeBuf(&cd);
+				delete[] cd.in_buf;
+				cd.in_buf = cd.out_buf;
+				cd.in_size = cd.out_size;
 
-//		delete[] cd.in_buf;
-//		cd.in_buf = cd.out_buf;
-//		cd.in_size = cd.out_size;
+				rle->encodeBuf(&cd);
+				break;
+			case 5:
+				// "DC + Huffman Coding"
+				dc->encodeBuf(&cd);
+				break;
+			case 6:
+				// "IF + RLE + Huffman Coding"
+				invfreq->encodeBuf(&cd);
 
-//		delete[] cd.in_buf;
-//		cd.in_buf = cd.out_buf;
-//		cd.in_size = cd.out_size;
+				delete[] cd.in_buf;
+				cd.in_buf = cd.out_buf;
+				cd.in_size = cd.out_size;
 
+				rle->encodeBuf(&cd);
+				break;
+			case 7:
+				// "IF + Huffman Coding"
+				invfreq->encodeBuf(&cd);
+				break;
+			case 8:
+				// "MTF + RLE + Huffman Coding"
+				mtf->encodeBuf(&cd);
 
+				delete[] cd.in_buf;
+				cd.in_buf = cd.out_buf;
+				cd.in_size = cd.out_size;
+
+				rle->encodeBuf(&cd);
+				break;
+			case 9:
+				// "MTF + Huffman Coding"
+				mtf->encodeBuf(&cd);
+				break;
+		}
+
+		delete[] cd.in_buf;
+		cd.in_buf = cd.out_buf;
+		cd.in_size = cd.out_size;
 
 		hc.encodeBuf(&cd);
 
-//		ac.encodeBuf(&cd);
-
 		output.write((char*)cd.out_buf, cd.out_size);
 
-//		delete[] cd.in_buf;
-//		delete[] cd.out_buf;
-
-
-//		switch(alg_type){
-//			case 1:
-//				// "RLE-2 + IFC + Huffman Coding"
-//				buf_2 = doRLE2andIFCandHCencode(buf_1, data_size);
-//				break;
-//			case 2:
-//				// "RLE-0 + IFC + Huffman Coding"
-//				buf_2 = doRLEencode(buf_1, data_size);
-//
-//				break;
-//			case 3:
-//				cout << "IFC + Huffman Coding" << endl;
-//				break;
-//			case 4:
-//				cout << "DC + RLE + Huffman Coding" << endl;
-//				break;
-//			case 5:
-//				cout << "DC + Huffman Coding" << endl;
-//				break;
-//			case 6:
-//				cout << "IF + RLE + Huffman Coding" << endl;
-//				break;
-//			case 7:
-//				cout << "IF + Huffman Coding" << endl;
-//				break;
-//			case 8:
-//				cout << "MTF + RLE + Huffman Coding" << endl;
-//				break;
-//			case 9:
-//				cout << "MTF + Huffman Coding" << endl;
-//				break;
-//		}
-
-//		delete[] buf_1;
+		delete[] cd.in_buf;
+		delete[] cd.out_buf;
+		delete[] buf_1;
 	}
 
 	if(decoding){
+		decoder = new BWTdecoder(block_size);
 
 		buf_1 = new uint8_t[data_size];
 		input.read(reinterpret_cast<char *>(buf_1), data_size);
 
-		SecondStepAlgs::MTF mtf;
-		SecondStepAlgs::HuffmanCoder hc;
-		SecondStepAlgs::RLE rle;
-		SecondStepAlgs::DC dc;
-		SecondStepAlgs::IFC ifc;
-		SecondStepAlgs::IF invfreq;
-		SecondStepAlgs::ArthmeticCoder ac;
-
-		SecondStepAlgs::coderData cd;
-
 		cd.in_buf = buf_1;
 		cd.in_size = data_size;
 
-
-
 		hc.decodeBuf(&cd);
-//		ac.decodeBuf(&cd);
 
-//		delete[] cd.in_buf;
-//		cd.in_buf = cd.out_buf;
-//		cd.in_size = cd.out_size;
+		delete[] cd.in_buf;
+		cd.in_buf = cd.out_buf;
+		cd.in_size = cd.out_size;
 
-//		invfreq.decodeBuf(&cd);
-//		rle.decodeBuf(&cd);
+		switch(alg_type){
+			case 1:
+				// "RLE-2 + IFC + Huffman Coding"
+				break;
+			case 2:
+				// "RLE-0 + IFC + Huffman Coding"
+				break;
+			case 3:
+				// "IFC + Huffman Coding"
+				break;
+			case 4:
+				// "DC + RLE + Huffman Coding";
+				rle->decodeBuf(&cd);
 
-//		ifc.decodeBuf(&cd);
-//		dc.decodeBuf(&cd);
-//
-//		delete[] cd.in_buf;
-//		cd.in_buf = cd.out_buf;
-//		cd.in_size = cd.out_size;
-//
-//		mtf.decodeBuf(&cd);
+				delete[] cd.in_buf;
+				cd.in_buf = cd.out_buf;
+				cd.in_size = cd.out_size;
 
-		output.write((char*)cd.out_buf, cd.out_size);
+				dc->decodeBuf(&cd);
+				break;
+			case 5:
+				// "DC + Huffman Coding"
+				dc->decodeBuf(&cd);
+				break;
+			case 6:
+				// "IF + RLE + Huffman Coding"
+				rle->decodeBuf(&cd);
 
-//		delete[] cd.in_buf;
-//		delete[] cd.out_buf;
+				delete[] cd.in_buf;
+				cd.in_buf = cd.out_buf;
+				cd.in_size = cd.out_size;
 
-//		delete[] buf_1;
+				invfreq->decodeBuf(&cd);
+				break;
+			case 7:
+				// "IF + Huffman Coding"
+				invfreq->decodeBuf(&cd);
+				break;
+			case 8:
+				// "MTF + RLE + Huffman Coding"
+				rle->decodeBuf(&cd);
 
-//		switch(alg_type){
-//			case 1:
-//				cout << "RLE-2 + IFC + Huffman Coding" << endl;
-//				break;
-//			case 2:
-//				cout << "RLE-0 + IFC + Huffman Coding" << endl;
-//				break;
-//			case 3:
-//				cout << "IFC + Huffman Coding" << endl;
-//				break;
-//			case 4:
-//				cout << "DC + RLE + Huffman Coding" << endl;
-//				break;
-//			case 5:
-//				cout << "DC + Huffman Coding" << endl;
-//				break;
-//			case 6:
-//				cout << "IF + RLE + Huffman Coding" << endl;
-//				break;
-//			case 7:
-//				cout << "IF + Huffman Coding" << endl;
-//				break;
-//			case 8:
-//				cout << "MTF + RLE + Huffman Coding" << endl;
-//				break;
-//			case 9:
-//				cout << "MTF + Huffman Coding" << endl;
-//				break;
-//		}
+				delete[] cd.in_buf;
+				cd.in_buf = cd.out_buf;
+				cd.in_size = cd.out_size;
+
+				mtf->decodeBuf(&cd);
+				break;
+			case 9:
+				// "MTF + Huffman Coding"
+				mtf->decodeBuf(&cd);
+				break;
+		}
+
+		int size2 = (reinterpret_cast<uint32_t*>(cd.out_buf))[0];
+		uint8_t* buf_2 = new uint8_t[size2];
+		memset(buf_2, 0 , sizeof(uint8_t) * size2);
+
+		decoder->decode(reinterpret_cast<unsigned char*>(cd.out_buf) + sizeof(uint32_t), buf_2, size2 + ceil(size2/block_size)*sizeof(int));
+
+		output.write((char*)buf_2, size2);
+
+		delete[] cd.in_buf;
+		delete[] cd.out_buf;
+		delete[] buf_2;
 	}
 
 	return EXIT_SUCCESS;
 }
 
-//***************************************
-//ENCODING
-//***************************************
-//		input.open(in_filename, fstream::in);
-//		if(input.fail()){
-//			cout << "Couldn't open input file: " << in_filename << endl;
-//			return EXIT_FAILURE;
-//		} else{
-//			input.seekg(0, fstream::end);
-//			data_size = input.tellg();
-//			if(data_size == -1){
-//				cout << "Couldn't get input file size: " << in_filename << endl;
-//				return EXIT_FAILURE;
-//			}
-//			input.seekg(0, fstream::beg);
-//		}
-//
-//BWTcoder encoder(block_size);
-//
-//cout << "BWT start" << endl;
-//
-//int size2 = data_size + ceil(data_size/block_size)*sizeof(int) + sizeof(uint32_t);
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0 , sizeof(uint8_t) * size2);
-//(reinterpret_cast<uint32_t*>(buf_2))[0] = data_size;
-//encoder.code(reinterpret_cast<unsigned char*>(buf_1), buf_2 + sizeof(uint32_t), data_size);
-//
-//output.open("encoded.bwt", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * size2);
-//output.close();
-//
-//delete[] buf_2;
-//
-//cout << "BWT end" << endl;
-//
-//SecondStepAlgs::MTF mtf;
-//
-//cout << "MTF start" << endl;
-//
-//buf_2 = new uint8_t[data_size];
-//memset(buf_2, 0 , sizeof(uint8_t) * data_size);
-//mtf.encodeBuf(buf_1, buf_2, data_size);
-//
-//output.open("encoded.mtf", fstream::out|fstream::trunc);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * data_size);
-//output.close();
-//
-//delete[] buf_2;
-//
-//cout << "MTF end" << endl;
-//
-//SecondStepAlgs::HuffmanCoder hc;
-//
-//cout << "HC start" << endl;
-//
-//size2 = data_size + alphabet_size + 2 * sizeof(int32_t);
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0 , sizeof(uint8_t) * size2);
-//
-//int32_t bits = hc.encodeBuf(buf_1, buf_2 + 2 * sizeof(int32_t), data_size);
-//
-//int real_data_size = hc.getData_size();
-//real_data_size += 2 * sizeof(uint32_t);
-//
-//(reinterpret_cast<int32_t*>(buf_2))[0] = data_size;
-//(reinterpret_cast<int32_t*>(buf_2))[1] = bits;
-////		size2 = ceil(bits/8) + 3 * buf_2[sizeof(int32_t) * 2] + 2 * sizeof(int32_t);
-//
-////		cout << "Real size = " << real_data_size << " Size2 = " << size2 << endl;
-//
-////		cout << "Bits = " << bits << " " << (reinterpret_cast<int32_t*>(buf_2))[1] << endl;
-//
-//output.open("encoded.hc", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * real_data_size);
-//output.close();
-//
-//delete[] buf_2;
-//
-//cout << "HC end" << endl;
-//
-//SecondStepAlgs::DC dc;
-//
-//cout << "DC start" << endl;
-//
-//size2 = data_size + alphabet_size + 1;
-//uint32_t* buf_3 = new uint32_t[size2];
-//memset(buf_3, 0 , sizeof(uint32_t) * size2);
-//
-//buf_3[0] = data_size;
-//
-//real_data_size = dc.encodeBuf(buf_1, buf_3 + 1, data_size);
-//real_data_size ++;
-//
-//output.open("encoded.dc", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_3), sizeof(uint32_t) * real_data_size);
-//output.close();
-//
-//delete[] buf_3;
-//
-//cout << "DC end" << endl;
-//
-//SecondStepAlgs::IF invfreq;
-//
-//cout << "IF start" << endl;
-//
-//size2 = data_size + 2 * alphabet_size + 1;
-//buf_3 = new uint32_t[size2];
-//memset(buf_3, 0 , sizeof(uint32_t) * size2);
-//
-//buf_3[0] = data_size;
-//
-//real_data_size = invfreq.encodeBuf(buf_1, buf_3 + 1, data_size);
-//real_data_size ++;
-//
-//output.open("encoded.if", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_3), sizeof(uint32_t) * real_data_size);
-//output.close();
-//
-//delete[] buf_3;
-//
-//cout << "IF end" << endl;
-//
-//SecondStepAlgs::IFC ifc;
-//
-//cout << "IFC start" << endl;
-//
-//buf_2 = new uint8_t[data_size];
-//memset(buf_2, 0 , sizeof(uint8_t) * data_size);
-//
-//ifc.encodeBuf(buf_1, buf_2, data_size);
-//
-//output.open("encoded.ifc", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * data_size);
-//output.close();
-//
-//delete[] buf_2;
-//
-//cout << "IFC end" << endl;
-//
-//SecondStepAlgs::RLE rle;
-//
-//cout << "RLE start" << endl;
-//
-//size2 = 2 * data_size + sizeof(uint32_t);
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0, sizeof(uint8_t) * size2);
-//
-//(reinterpret_cast<uint32_t*>(buf_2))[0] = data_size;
-//real_data_size = rle.encodeBuf(buf_1, buf_2 + sizeof(uint32_t), data_size);
-//real_data_size += sizeof(uint32_t);
-//
-//output.open("encoded.rle", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * real_data_size);
-//output.close();
-//
-//delete[] buf_2;
-//
-//cout << "RLE end" << endl;
-//
-//SecondStepAlgs::RLE_2 rle2;
-//
-//cout << "RLE start" << endl;
-//
-//size2 = data_size + (data_size + 3) * sizeof(uint32_t);
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0, sizeof(uint8_t) * size2);
-//
-//(reinterpret_cast<uint32_t*>(buf_2))[0] = data_size;
-//(reinterpret_cast<uint32_t*>(buf_2))[1] = rle2.encodeBuf(buf_1, buf_2 + sizeof(uint32_t) * 3, data_size);
-//(reinterpret_cast<uint32_t*>(buf_2))[2] = rle2.getSizeRLE_buffer();
-//
-//real_data_size = (reinterpret_cast<uint32_t*>(buf_2))[1] + (reinterpret_cast<uint32_t*>(buf_2))[2] * sizeof(uint32_t) + 3 * sizeof(uint32_t);
-//
-//uint32_t * tmp = rle2.getRLE_buffer();
-//memcpy(buf_2 + 3 * sizeof(uint32_t) + (reinterpret_cast<uint32_t*>(buf_2))[1] * sizeof(uint8_t), tmp, (reinterpret_cast<uint32_t*>(buf_2))[2] * sizeof(uint32_t));
-//
-//output.open("encoded.rle2", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * real_data_size);
-//output.close();
-//
-//delete[] buf_2;
-//
-//cout << "RLE2 end" << endl;
-
-//********************************
-//DECODING
-//********************************
-//int size2;
-//		BWTdecoder decoder(block_size);
-//
-//		cout << "BWT start" << endl;
-//
-//		input.open("encoded.bwt", fstream::in|fstream::binary);
-//		if(input.fail()){
-//			cout << "Couldn't open input file: " << "encoded.bwt" << endl;
-//			return EXIT_FAILURE;
-//		} else{
-//			input.seekg(0, fstream::end);
-//			data_size = input.tellg();
-//			if(data_size == -1){
-//				cout << "Couldn't get input file size: " << "encoded.bwt" << endl;
-//				return EXIT_FAILURE;
-//			}
-//			input.seekg(0, fstream::beg);
-//		}
-//
-//		buf_1 = new uint8_t[data_size];
-//		input.read(reinterpret_cast<char *>(buf_1), data_size);
-//
-//		size2 = (reinterpret_cast<uint32_t*>(buf_2))[0];
-//		buf_2 = new uint8_t[size2];
-//		memset(buf_2, 0 , sizeof(uint8_t) * size2);
-//
-//		decoder.decode(reinterpret_cast<unsigned char*>(buf_1) + sizeof(uint32_t), buf_2, data_size);
-//
-//		output.open("decoded.bwt", fstream::out|fstream::trunc|fstream::binary);
-//		output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * size2);
-//		output.close();
-//
-//		input.close();
-//
-//		delete[] buf_1;
-//		delete[] buf_2;
-//
-//		cout << "BWT end" << endl;
-//
-//SecondStepAlgs::MTF mtf;
-//
-//cout << "MTF start" << endl;
-//
-//input.open("encoded.mtf", fstream::in);
-//if(input.fail()){
-//	cout << "Couldn't open input file: " << "encoded.mtf" << endl;
-//	return EXIT_FAILURE;
-//} else{
-//	input.seekg(0, fstream::end);
-//	data_size = input.tellg();
-//	if(data_size == -1){
-//		cout << "Couldn't get input file size: " << "encoded.mtf" << endl;
-//		return EXIT_FAILURE;
-//	}
-//	input.seekg(0, fstream::beg);
-//}
-//
-//buf_1 = new uint8_t[data_size];
-//input.read(reinterpret_cast<char *>(buf_1), data_size);
-//
-//buf_2 = new uint8_t[data_size];
-//memset(buf_2, 0 , sizeof(uint8_t) * data_size);
-//
-//mtf.decodeBuf(buf_1, buf_2, data_size);
-//
-//output.open("decoded.mtf", fstream::out|fstream::trunc);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * data_size);
-//output.close();
-//
-//input.close();
-//
-//delete[] buf_1;
-//delete[] buf_2;
-//
-//cout << "MTF end" << endl;
-//
-//SecondStepAlgs::HuffmanCoder hc;
-//
-//cout << "HC start" << endl;
-//
-//input.open("encoded.hc", fstream::in|fstream::binary);
-//if(input.fail()){
-//	cout << "Couldn't open input file: " << "encoded.hc" << endl;
-//	return EXIT_FAILURE;
-//} else{
-//	input.seekg(0, fstream::end);
-//	data_size = input.tellg();
-//	if(data_size == -1){
-//		cout << "Couldn't get input file size: " << "encoded.hc" << endl;
-//		return EXIT_FAILURE;
-//	}
-//	input.seekg(0, fstream::beg);
-//}
-//
-//buf_1 = new uint8_t[data_size];
-//input.read(reinterpret_cast<char *>(buf_1), data_size);
-//
-//size2 = (reinterpret_cast<int32_t*>(buf_1))[0];
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0 , sizeof(uint8_t) * size2);
-//
-//int32_t bits = (reinterpret_cast<int32_t*>(buf_1))[1];
-//
-//cout << "Bits = " << bits << endl;
-//
-//hc.decodeBuf(buf_1 + sizeof(uint32_t) * 2, buf_2, bits);
-//
-//output.open("decoded.hc", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * size2);
-//output.close();
-//
-//input.close();
-//
-//delete[] buf_1;
-//delete[] buf_2;
-//
-//cout << "HC end" << endl;
-//
-//SecondStepAlgs::DC dc;
-//
-//cout << "DC start" << endl;
-//
-//input.open("encoded.dc", fstream::in|fstream::binary);
-//if(input.fail()){
-//	cout << "Couldn't open input file: " << "encoded.dc" << endl;
-//	return EXIT_FAILURE;
-//} else{
-//	input.seekg(0, fstream::end);
-//	data_size = input.tellg();
-//	if(data_size == -1){
-//		cout << "Couldn't get input file size: " << "encoded.dc" << endl;
-//		return EXIT_FAILURE;
-//	}
-//	input.seekg(0, fstream::beg);
-//}
-//
-//buf_1 = new uint8_t[data_size];
-//input.read(reinterpret_cast<char *>(buf_1), data_size);
-//
-//uint32_t* buf_3 = reinterpret_cast<uint32_t*>(buf_1);
-//
-//size2 = buf_3[0];
-//
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0 , sizeof(uint8_t) * size2);
-//
-//dc.decodeBuf(buf_3 + 1, buf_2, size2);
-//
-//output.open("decoded.dc", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * size2);
-//output.close();
-//
-//input.close();
-//
-//delete[] buf_1;
-//delete[] buf_2;
-//
-//cout << "DC end" << endl;
-//
-//SecondStepAlgs::IF invfreq;
-//
-//cout << "IF start" << endl;
-//
-//input.open("encoded.if", fstream::in|fstream::binary);
-//if(input.fail()){
-//	cout << "Couldn't open input file: " << "encoded.if" << endl;
-//	return EXIT_FAILURE;
-//} else{
-//	input.seekg(0, fstream::end);
-//	data_size = input.tellg();
-//	if(data_size == -1){
-//		cout << "Couldn't get input file size: " << "encoded.if" << endl;
-//		return EXIT_FAILURE;
-//	}
-//	input.seekg(0, fstream::beg);
-//}
-//
-//buf_1 = new uint8_t[data_size];
-//input.read(reinterpret_cast<char *>(buf_1), data_size);
-//
-//buf_3 = reinterpret_cast<uint32_t*>(buf_1);
-//
-//size2 = buf_3[0];
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0 , sizeof(uint8_t) * size2);
-//
-//invfreq.decodeBuf(buf_3 + 1, buf_2, size2);
-//
-//output.open("decoded.if", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * size2);
-//output.close();
-//
-//input.close();
-//
-//delete[] buf_1;
-//delete[] buf_2;
-//
-//cout << "IF end" << endl;
-//
-//SecondStepAlgs::IFC ifc;
-//
-//cout << "IFC start" << endl;
-//
-//input.open("encoded.ifc", fstream::in|fstream::binary);
-//if(input.fail()){
-//	cout << "Couldn't open input file: " << "encoded.ifc" << endl;
-//	return EXIT_FAILURE;
-//} else{
-//	input.seekg(0, fstream::end);
-//	data_size = input.tellg();
-//	if(data_size == -1){
-//		cout << "Couldn't get input file size: " << "encoded.ifc" << endl;
-//		return EXIT_FAILURE;
-//	}
-//	input.seekg(0, fstream::beg);
-//}
-//
-//buf_1 = new uint8_t[data_size];
-//input.read(reinterpret_cast<char *>(buf_1), data_size);
-//
-//buf_2 = new uint8_t[data_size];
-//memset(buf_2, 0 , sizeof(uint8_t) * data_size);
-//
-//ifc.decodeBuf(buf_1, buf_2, data_size);
-//
-//output.open("decoded.ifc", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * data_size);
-//output.close();
-//
-//input.close();
-//
-//delete[] buf_1;
-//delete[] buf_2;
-//
-//cout << "IFC end" << endl;
-//
-//SecondStepAlgs::RLE rle;
-//
-//cout << "RLE start" << endl;
-//
-//input.open("encoded.rle", fstream::in|fstream::binary);
-//if(input.fail()){
-//	cout << "Couldn't open input file: " << "encoded.rle" << endl;
-//	return EXIT_FAILURE;
-//} else{
-//	input.seekg(0, fstream::end);
-//	data_size = input.tellg();
-//	if(data_size == -1){
-//		cout << "Couldn't get input file size: " << "encoded.rle" << endl;
-//		return EXIT_FAILURE;
-//	}
-//	input.seekg(0, fstream::beg);
-//}
-//
-//buf_1 = new uint8_t[data_size];
-//input.read(reinterpret_cast<char *>(buf_1), data_size);
-//
-//size2 = (reinterpret_cast<uint32_t*>(buf_1))[0];
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0, sizeof(uint8_t) * size2);
-//
-//rle.decodeBuf(buf_1 + sizeof(uint32_t), buf_2, data_size - sizeof(uint32_t));
-//
-//output.open("decoded.rle", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * size2);
-//output.close();
-//
-//input.close();
-//
-//delete[] buf_1;
-//delete[] buf_2;
-//
-//cout << "RLE end" << endl;
-//
-//SecondStepAlgs::RLE_2 rle2;
-//
-//cout << "RLE 2 start" << endl;
-//
-//input.open("encoded.rle2", fstream::in|fstream::binary);
-//if(input.fail()){
-//	cout << "Couldn't open input file: " << "encoded.rle2" << endl;
-//	return EXIT_FAILURE;
-//} else{
-//	input.seekg(0, fstream::end);
-//	data_size = input.tellg();
-//	if(data_size == -1){
-//		cout << "Couldn't get input file size: " << "encoded.rle2" << endl;
-//		return EXIT_FAILURE;
-//	}
-//	input.seekg(0, fstream::beg);
-//}
-//
-//buf_1 = new uint8_t[data_size];
-//input.read(reinterpret_cast<char *>(buf_1), data_size);
-//
-//size2 = (reinterpret_cast<uint32_t*>(buf_1))[0];
-//buf_2 = new uint8_t[size2];
-//memset(buf_2, 0, sizeof(uint8_t) * size2);
-//
-//data_size = (reinterpret_cast<uint32_t*>(buf_1))[1];
-//
-//uint32_t * tmp = new uint32_t[(reinterpret_cast<uint32_t*>(buf_1))[2]];
-//memcpy(tmp, buf_1 + 3 * sizeof(uint32_t) + data_size * sizeof(uint8_t), (reinterpret_cast<uint32_t*>(buf_1))[2] * sizeof(uint32_t));
-//
-//rle2.setRLE_buffer(tmp, (reinterpret_cast<uint32_t*>(buf_1))[2]);
-//
-//rle2.encodeBuf(buf_1  + sizeof(uint32_t) * 3 , buf_2, size2);
-//
-//output.open("decoded.rle2", fstream::out|fstream::trunc|fstream::binary);
-//output.write(reinterpret_cast<char*>(buf_2), sizeof(uint8_t) * size2);
-//output.close();
-//
-//input.close();
-//
-//delete[] buf_1;
-//delete[] buf_2;
-//
-//cout << "RLE2 end" << endl;

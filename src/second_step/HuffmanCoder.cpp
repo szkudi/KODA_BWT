@@ -133,9 +133,9 @@ int HuffmanCoder::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_siz
 
 void HuffmanCoder::encodeBuf(coderData* data){
 
-	int out_pos = 1;
-	uint8_t bits_left = 8;
-	int tmp_bits = 0;
+	int out8_pos = 0;
+	int out16_pos = 0;
+	uint8_t bits_in;
 	int count = 0;
 	int bits = 0;
 
@@ -145,204 +145,130 @@ void HuffmanCoder::encodeBuf(coderData* data){
 
 	constructTree();
 
-	data->out_buf = new uint8_t[data->in_size + 2 * used_alph_size + (2 + used_alph_size) * sizeof(uint32_t)];
-	memset(data->out_buf, 0, data->in_size + 2 * used_alph_size + (2 + used_alph_size) * sizeof(uint32_t));
+	data->out_buf = new uint8_t[data->in_size + 2 * used_alph_size + (3 + used_alph_size) * sizeof(uint32_t)];
+	memset(data->out_buf, 0, data->in_size + 2 * used_alph_size + (3 + used_alph_size) * sizeof(uint32_t));
 
-	uint8_t* out = data->out_buf + 2 * sizeof(uint32_t);
+	uint8_t* out8 = data->out_buf + 3 * sizeof(uint32_t);
 
 	for(int i = 0; i < alphabet_size; ++i){
 		if(num_of_bits[i] > 0){
 			count ++;
-			out[out_pos++] = i;
-			(reinterpret_cast<uint32_t*>(out + out_pos))[0] = alphabet_weights[i];
-			out_pos += sizeof(uint32_t);
-			out[out_pos++] = num_of_bits[i];
-//			cout << (char)i << " wartosc = " << alphabet_weights[i] << " bitow = " << num_of_bits[i] << endl;;
+			out8[out8_pos++] = i;
+			(reinterpret_cast<uint32_t*>(out8 + out8_pos))[0] = alphabet_weights[i];
+			out8_pos += sizeof(uint32_t);
+			out8[out8_pos++] = num_of_bits[i];
 		}
 	}
-	out[0] = count;
+	cout << count << endl;
 
-	uint32_t* out32 = reinterpret_cast<uint32_t*>(out + out_pos);
+	uint16_t* out16 = reinterpret_cast<uint16_t*>(out8 + out8_pos);
+	uint32_t* buff = new uint32_t;
+	memset(buff, 0, sizeof(uint32_t));
+	(*buff) = 0;
 
-	bits_left = 32;
-	int out32_pos = 0;
+	bits_in = 0;
 	for(unsigned int i = 0; i < data->in_size; ++i){
 		bits += num_of_bits[data->in_buf[i]];
-		if(num_of_bits[data->in_buf[i]] < bits_left){
-			out32[out32_pos] |= alphabet_weights[data->in_buf[i]] << (bits_left - num_of_bits[data->in_buf[i]]);
-//			cout << i << " Less" << " bits " << num_of_bits[data->in_buf[i]]  << " char " <<  alphabet_weights[data->in_buf[i]] <<  " out " << out32[out32_pos] <<  endl;
-			bits_left -= num_of_bits[data->in_buf[i]];
-		}else{
-			tmp_bits = num_of_bits[data->in_buf[i]] - bits_left;
-			out32[out32_pos] |= alphabet_weights[data->in_buf[i]] >> tmp_bits;
-
-//			cout << i << " Else" << " bits " << num_of_bits[data->in_buf[i]]  << " tmp_bits " << tmp_bits << " char " <<  alphabet_weights[data->in_buf[i]] << " out " << out32[out32_pos] << endl;
-
-			out32_pos++;
-			bits_left = 32;
-
-			if(tmp_bits){
-				out32[out32_pos] |= alphabet_weights[data->in_buf[i]] << (bits_left - tmp_bits);
-				bits_left -= tmp_bits;
-			}
+		(*buff) <<= num_of_bits[data->in_buf[i]];
+		(*buff) += alphabet_weights[data->in_buf[i]];
+		bits_in += num_of_bits[data->in_buf[i]];
+		if(bits_in > 16){//Write out 16 bits
+			out16[out16_pos++] = getBitsFromBuffer(*buff, bits_in);
+			bits_in -= 16;
 		}
 	}
 
-	cout << bits << endl;
+	(*buff) <<= (32 - bits_in);
 
-//	out[out_pos] = 0;
-//	for(unsigned int i = 0; i < data->in_size; ++i){
-//		bits += num_of_bits[data->in_buf[i]];
-//		if(num_of_bits[data->in_buf[i]] < bits_left){
-//			out[out_pos] += (uint32_t)(alphabet_weights[data->in_buf[i]] * pow(2, bits_left - num_of_bits[data->in_buf[i]])) % 256;
-//			bits_left -= num_of_bits[data->in_buf[i]];
-//		}else{
-//			tmp_bits = num_of_bits[data->in_buf[i]] - bits_left;
-//			out[out_pos] +=  (uint32_t)(alphabet_weights[data->in_buf[i]] / pow(2, tmp_bits)) % 256;
-//			out_pos++;
-////			out[out_pos] = 0;
-//			bits_left = 8;
-//			for(int j = 0; j < ceil(1.0*tmp_bits/8); ++j){
-//				if(tmp_bits > bits_left){
-//					tmp_bits -= bits_left;
-//					out[out_pos] +=  (uint32_t)(alphabet_weights[data->in_buf[i]] / pow(2, tmp_bits)) % 256;
-//					out_pos++;
-////					out[out_pos] = 0;
-//				}else{
-//					out[out_pos] +=  (uint32_t)(alphabet_weights[data->in_buf[i]] * pow(2, bits_left - tmp_bits)) % 256;
-//					bits_left -= tmp_bits;
-//				}
-//			}
-//		}
-//	}
+	out16[out16_pos++] = (reinterpret_cast<uint16_t*>(buff))[1];
+	out16[out16_pos++] = (reinterpret_cast<uint16_t*>(buff))[0];
 
-//	if(bits_left != 8)
-//		data->out_size = out_pos + 1 + 2 * sizeof(uint32_t);
-//	else
-//		data->out_size = out_pos + 2 * sizeof(uint32_t);
 
-	data->out_size = out_pos + (out32_pos + 3) * sizeof(uint32_t);
+	data->out_size = out8_pos + (out16_pos) * sizeof(uint16_t) + 3 * sizeof(uint32_t);
 
 	data->var_1 = bits;//(out_pos - 2 * count - sizeof(uint32_t) * count) * 8 - bits_left;
-//	cout << bits << " " << data->var_1 << endl;
 
 	(reinterpret_cast<uint32_t*>(data->out_buf))[0] = data->in_size; //Remember original input size
 	(reinterpret_cast<uint32_t*>(data->out_buf))[1] = data->var_1; //Remember number of bits in output
-
-
-
-
-//	for(unsigned int i = 0; i < data->in_size; ++i){
-////		cout << "Znak nr = " << i << " bitów = " << num_of_bits[data->in_buf[i]] << endl;
-////		if(i == 105 + sizeof(uint32_t))
-////			cout <<  "bitów = " << num_of_bits[data->in_buf[i]] << " znak = " <<  (int)data->in_buf[i] << " bits_left = " << (int)bits_left << endl;
-//		if(num_of_bits[data->in_buf[i]] < bits_left){
-//			out[out_pos] |= ((alphabet_weights[data->in_buf[i]] << (bits_left - num_of_bits[data->in_buf[i]])) & 0xFF);
-//			bits_left -= num_of_bits[data->in_buf[i]];
-//		}else{
-//			tmp_bits = num_of_bits[data->in_buf[i]] - bits_left;
-//			out[out_pos] |= ((alphabet_weights[data->in_buf[i]] >> tmp_bits) & 0xFF);
-//			out_pos++;
-////			out[out_pos] = 0;
-//			bits_left = 8;
-//			for(int j = 0; j < ceil((1.0*tmp_bits)/8); ++j){
-//				if(tmp_bits < bits_left){
-//					out[out_pos] |= ((alphabet_weights[data->in_buf[i]] << (bits_left - tmp_bits)) & 0xFF);//num_of_bits[in_buf[i]])) & 0xFF);
-//					bits_left -= tmp_bits;
-//				}else{
-//					tmp_bits -= 8;
-//					out[out_pos] |= ((alphabet_weights[data->in_buf[i]] >> tmp_bits) & 0xFF);
-//					out_pos++;
-////					out[out_pos] = 0;
-//				}
-//			}
-//		}
-////		if(i == 105 + sizeof(uint32_t))
-////			cout << "wpisany znak = " << alphabet_weights[data->in_buf[i]] << " bits_left = " << (int)bits_left << " " << (int)out[out_pos] << " bajt " << out_pos  << endl;
-//	}
-//
-//	if(bits_left != 8)
-//		data->out_size = out_pos + 1 + 2 * sizeof(uint32_t);
-//	else
-//		data->out_size = out_pos + 2 * sizeof(uint32_t);
-//
-//
-//	data->var_1 = (out_pos  - 2 * count - sizeof(uint32_t) * count) * 8 - bits_left;
-//
-//	(reinterpret_cast<uint32_t*>(data->out_buf))[0] = data->in_size; //Remember original input size
-//	(reinterpret_cast<uint32_t*>(data->out_buf))[1] = data->var_1; //Remember number of bits in output
+	(reinterpret_cast<uint32_t*>(data->out_buf))[2] = count; //Remember number of alphabet elements
 }
 
 void HuffmanCoder::decodeBuf(coderData* data){
 
-//	uint8_t mask;
-	uint32_t mask;
 	uint32_t c = 0;
 	int out_pos = 0;
-	int in_pos = 0;
+	int in8_pos = 0;
+	int in16_pos = 0;
 	int tmp;
 	int bits_num = 0;
+	int bits_out = 0;
 
 	init();
 
-	uint8_t* in = data->in_buf + 2 * sizeof(uint32_t);
+	uint8_t* in8 = data->in_buf + 3 * sizeof(uint32_t);
 
 	data->out_size = (reinterpret_cast<uint32_t*>(data->in_buf))[0];
 	data->var_1 = (reinterpret_cast<uint32_t*>(data->in_buf))[1];
-
-//	cout << data->var_1 << endl;
+	int count = (reinterpret_cast<uint32_t*>(data->in_buf))[2];
 
 	data->out_buf = new uint8_t[data->out_size];
 
-	int count = in[in_pos++];
-
 	for(int i = 0; i < count; ++i){
-		tmp = in[in_pos++];
-		alphabet_weights[tmp] = (reinterpret_cast<const uint32_t*>(in + in_pos))[0];
-		in_pos += sizeof(uint32_t);
-		num_of_bits[tmp] = in[in_pos++];
-//		cout <<(char)tmp << " wartosc = " <<  alphabet_weights[tmp] << " bitow " << num_of_bits[tmp] << endl;
+		tmp = in8[in8_pos++];
+		alphabet_weights[tmp] = (reinterpret_cast<const uint32_t*>(in8 + in8_pos))[0];
+		in8_pos += sizeof(uint32_t);
+		num_of_bits[tmp] = in8[in8_pos++];
 	}
 
-	uint32_t* in32 = reinterpret_cast<uint32_t*>(in + in_pos);
+	uint32_t* buff = new uint32_t;
+	memset(buff, 0, sizeof(uint32_t));
 
-	for(int i = 0; i < data->var_1; ++i){
-//		mask = 1 << (7 - i % 8);
-		mask = 1 << (31 - i % 32);
+	uint16_t* in16 = reinterpret_cast<uint16_t*>(in8 + in8_pos);
+
+	(reinterpret_cast<uint16_t*>(buff))[1] = in16[in16_pos++];
+	(reinterpret_cast<uint16_t*>(buff))[0] = in16[in16_pos++];
+
+	cout << data->var_1 << endl;
+
+	for(unsigned int i = 0; i < data->var_1; ++i){
 		c <<= 1;
-//		if((mask & in[in_pos + i/8]) != 0)
-		if((mask & in32[i/32]) != 0)
-			c += 1;
 		bits_num++;
+		if((*buff) & 0x80000000){
+			c++;
+		}
 		tmp = findCharacter(c, bits_num);
 		if(tmp != -1){
-//			cout << "Znak nr = " << out_pos << " bitow = " << bits_num << " znak = " << tmp << endl;
 			data->out_buf[out_pos++] = tmp;
 			c = 0;
 			bits_num = 0;
 		}
+		(*buff) <<= 1;
+		bits_out++;
+		if(bits_out >= 16){
+			(reinterpret_cast<uint16_t*>(buff))[0] = in16[in16_pos++];
+			bits_out -= 16;
+		}
+
 	}
 
+}
 
+uint32_t HuffmanCoder::generateMask(int size){
+	uint32_t ret = 0;
+	for(int i = 0; i < size; ++i){
+		ret <<= 1;
+		ret++;
+	}
+	return ret;
+}
 
-//	for(int i = 0; i < data->var_1; ++i){
-//		tmp = 0;
-//		mask = 1 << (7 - i%8);
-//		c = c << 1;
-//		bits_num++;
-//		c += (in[in_pos + i/8] & mask) != 0?1:0;
-////		cout << "Mask = " << (int)mask  << " c = " << c << endl;
-//		tmp = findCharacter(c, bits_num);
-//		if(tmp != -1){
-////			cout << "Znak nr = " << out_pos << " bitow = " << bits_num << " znak = " << tmp << endl;
-//			data->out_buf[out_pos++] = (uint8_t)tmp;
-//			c = 0;
-//			bits_num = 0;
-//		}
-////		if(in_pos + i/8 == 503)
-////			cout << "bajt = " << (int)in[in_pos + i/8] <<  " maska = " << (int)mask << " bits_num = " << bits_num << " c = " << (int)c << " tmp = " << tmp << endl;
-//
-//	}
+uint16_t HuffmanCoder::getBitsFromBuffer(uint32_t buff, int bits){
+//	cout << "Before = " << buff << " shift = " << bits - 16;
+	buff >>= (bits - 16);
+	buff &= 0xFFFF;
+//	cout << " return = " << buff << endl;
+	return (uint16_t)buff;
+
 }
 
 
