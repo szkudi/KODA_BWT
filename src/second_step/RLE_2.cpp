@@ -123,7 +123,7 @@ void RLE_2::encodeBuf(coderData* data){
 		RLE_buffer.push_back(run_length);
 	}
 
-	data->out_size = output_index + sizeof(uint32_t);
+	data->out_size = output_index + 2 * sizeof(uint32_t);
 	(reinterpret_cast<uint32_t*>(data->out_buf))[1] = output_index;
 }
 
@@ -133,26 +133,28 @@ void RLE_2::decodeBuf(coderData* data){
 	int output_index = 0;
 	int rle_index = 0;
 
-	bool first = false;
-
 	data->out_size = (reinterpret_cast<uint32_t*>(data->in_buf))[0];
 	data->in_size = (reinterpret_cast<uint32_t*>(data->in_buf))[1];
 	data->out_buf = new uint8_t[data->out_size];
 
 	uint8_t* in = data->in_buf + 2 * sizeof(uint32_t);
 
-	for(unsigned int i = 0; i < data->in_size; ++i){
-		if(!first){
-			run_symbol = in[i];
-			data->out_buf[output_index++] = run_symbol;
-			first = true;
-		} else if(in[i] == run_symbol){
+	run_symbol = in[0];
+	data->out_buf[output_index++] = in[0];
+
+
+	for(unsigned int i = 1; i < data->in_size; ++i){
+
+		if(in[i] == run_symbol){
+
 			for(unsigned int j = 0; j < RLE_buffer[rle_index] - 1; j++)
 				data->out_buf[output_index++] = run_symbol;
 			rle_index++;
-			first = false;
+
 		} else{
+
 			run_symbol = in[i];
+			data->out_buf[output_index++] = in[i];
 		}
 
 	}

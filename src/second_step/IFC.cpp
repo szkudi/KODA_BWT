@@ -209,7 +209,7 @@ void IFC::encodeBuf(coderData* data){
 
 	uint8_t* out = data->out_buf + sizeof(uint32_t);
 
-	for(unsigned int i = 0 ;i < data->in_size; ++i){
+	for(unsigned int i = 0; i < data->in_size; ++i){
 		//Calculate current index
 		if(!first && data->in_buf[i] == last_symbol)
 			index = alphabeth_index[last_symbol];
@@ -217,6 +217,8 @@ void IFC::encodeBuf(coderData* data){
 			index = alphabeth_index[data->in_buf[i]];
 
 		out[i] = index;
+		if(index > 255 || index < 0)
+			std::cout << i << " " << index << endl;
 
 		//Calculate difference from average rank
 		dif1 = avg1;
@@ -224,7 +226,6 @@ void IFC::encodeBuf(coderData* data){
 		dif1 = avg1 - dif1;
 
 		//Calculate increment
-
 		dif1 = min(fabs(dif1), (double)dm) * (dif1 < 0 ? -1 : 0);
 		inc1 -= (inc1 * dif1)/q;
 
