@@ -3,7 +3,7 @@ ROOT=report
 
 all:
 	pdflatex $(PDFLATEXOPT) $(ROOT)
-#	bibtex $(ROOT)
+	bibtex $(ROOT)
 	pdflatex $(PDFLATEXOPT) $(ROOT)
 	pdflatex $(PDFLATEXOPT) $(ROOT)
 

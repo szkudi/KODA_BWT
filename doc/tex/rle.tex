@@ -1,0 +1,9 @@
+%% !TeX root = report.tex
+
+W projekcie użyte zostały dwie odmiany algorytmu kodowania długości serii - RLE0 i RLE2. Podstawową różnicą w prezentowanych wersjach algorytmów jest sposób i miejsce zapisu informacji o długości znalezionego ciągu danych.
+
+\subsubsection{RLE0}
+RLE0\cite{deorowicz} jest najprostszą i najczęścej stosowaną implementacją tego algorytmu. Algorytm analizuje plik wejściowy znak po znaku i każdy ciąg znaków, zapisuje w postaci znaku reprezentującego ten ciąg i jego długości. Algorytm dzięki swej prostocie jest szybki, jednak w niesprzyjających warunkach prowadzi do wydłużenia danych zamiast ich kompresji.
+
+\subsubsection{RLE2}
+Podstawową różnicą pomiędzy RLE0 i RLE2\cite{abel} jest sposób przechowywania informacji o długości znalezionego ciągu. Algorytm analizuje dane wejściowe znak po znaku i w wypadku wykrycia ciągu o długości $n > 1$ zamienia taki ciąg na ciąg o długości dokładnie dwóch  znaków. Natomiast do drugiej tablicy zapisywana jet rzeczywista długość ciągu. Wykorzystanie RLE2 razem z algorytmem IFC (\ref{ch:ifc}) zostało opisane w \cite{abel}.
