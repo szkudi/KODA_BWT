@@ -1,0 +1,16 @@
+%% !TeX root = report.tex
+
+\section{Napotkane trudności}
+
+W czasie tworzenia przedstawionej w tym raporcie prezentacji napotkane zostały pewne trudności. Przede wszystkim najpoważniejszą było podejście do takiego implementowania algorytmów, by wynikowe, skompresowane dane zajmowały jak najmniej miejsca. Podstawowym problemem w przypadku takich algorytmów jak Distance Coding, Inversion Frequencies czy Huffman Coding był problem zapisu dodatkowych informacji niezbędnych przy dekompresji. Każdy z wymienionych algorytmów do poprawnego działania potrzebuje dodatkowych danych np. w algorytmie IF niezbędna jest lista zawierająca liczbę wystąpień każdego znaku. Takie dodatkowe dane stanowią szczególny problem w wypadku małych plików, gdyż ich długość, która musi być dodana do pliku wynikowego może nawet kilkukrotnie przekraczać długość skompresowanych danych.
+
+\section{Podsumowanie}
+
+W ramach projektu stworzona została implementacja algorytmów kompresji BWT. Zaimplementowane zostały oprócz samej transformaty różnego rodzaju algorytmy drugiego kroku. Algorytmy te są dość zróżnicowane pod względem czasu działania, uzyskiwanych wyników kompresji, prostoty implementacji.
+
+Stworzona implementacja okazała się być (WYDAJNA?/ NIE?) co pokazują wyniki przeprowadzonych testów.
+
+Co ciekawego udało nam się zrobić?
+	- uzyskać lepszą średnią bitową niż Bzip2 dla jednego pliku
+	- uzyskać lepsze czasy kompresji dla kilku plików
+	- sprawdzić nowe algorytmy fazy drugiej (IFC)

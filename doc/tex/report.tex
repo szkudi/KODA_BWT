@@ -80,6 +80,12 @@ Transformata Burrowsa-Wheelera to algorytm użyteczny przy bezstratnej kompresji
 
 
 \section{Wstęp}
+Wg. definicji zawartej na portalu Wikipedia kompresja danych "polega na zmianie sposobu zapisu informacji tak, aby zmniejszyć redundancję i tym samym objętość zbioru." W dzisiejszym świecie zagadnienie kompresji staje się co raz ważniejsze. Ludzkość generuje co raz to większe zbiory danych, których archiwizacja staje się niezbędna. Dlatego właśnie kompresja jest prężnie rozwijającą się gałęzią nauki, której wymierne wyniki widzimy na co dzień. Można wyróżnić dwa podstawowe typy kompresji:
+\begin{enumerate}
+\item Kompresja stratna - nie pozwala ona na dokładne odtworzenie danych, jednak interesujące nas informacje zachowane są w stopniu pozwalającym na ich odczytanie, najlepszym przykładem tego typu kompresji są cyfrowe obrazy.
+\item Kompresja bezstratna - pozwala na dokładne odtworzenie kompresowanych danych, dzięki czemu mogą one być ponownie przetwarzane.
+\end{enumerate}
+Opisana w tym raporcie implementacja algorytmu kompresji BWT (ang. BWCA - Burrows-Wheeler Compression Algorithm) należy do tej drugiej kategorii. Ze względu na są prostotę działania i dobre efekty kompresji wykorzystywana jest m.in. w popularnym algorytmie kompresji BZIP2.
 
 
 \section{Implementacja}
@@ -113,12 +119,20 @@ W ramach projektu zaimplementowane zostały algorytm transformaty Burrowsa-Wheel
 \section{Testy}
 
 \subsection{Aplikacja testująca}
+\label{ch:app_test}
+\input{test_app}
 
 \subsection{Testy wydajności}
 
 \subsubsection{Dane testowe}
+\input{dane}
 
 \subsubsection{Wyniki}
+\input{wyniki}
+
+\input{podsumowanie}
+
+\clearpage
 
 \bibliography{mybib}{}
 \bibliographystyle{plain}
