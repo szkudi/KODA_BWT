@@ -80,7 +80,6 @@ public:
     void setRLE_buffer(const uint32_t* buffer, int size);
 
 private:
-//	uint8_t run_symbol;
 	int output_index;
 	vector<uint32_t> RLE_buffer;
 };

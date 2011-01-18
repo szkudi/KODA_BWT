@@ -55,7 +55,6 @@ private:
 	 * Method used to generate starting alphabet
 	 */
 	void init(bool lst_only = false);
-	int findIndex(uint8_t num);
 
 	static const int alphabet_size = 256;
 

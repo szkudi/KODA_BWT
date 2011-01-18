@@ -95,32 +95,21 @@ int HuffmanCoder::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_siz
 	init();
 
 	int count = in_buf[in_pos++];
-//	cout << "Count = " << count << endl;
 
 	for(int i = 0; i < count; ++i){
 		tmp = in_buf[in_pos++];
 		alphabet_weights[tmp] = (reinterpret_cast<const uint32_t*>(in_buf + in_pos))[0];
 		in_pos += sizeof(uint32_t);
 		num_of_bits[tmp] = in_buf[in_pos++];
-//		cout <<(char)tmp << " wartosc = " <<  alphabet_weights[tmp] << " bitow " << num_of_bits[tmp] << endl;
 	}
-
-//	count *= 3;
-//	count++; //Add first position containing number of alphabet elements
-
-//	cout << count << endl;
 
 	for(int i = 0; i < buf_size; ++i){
 		mask = 1 << (7 - i%8);
 		c = c << 1;
 		bits_num++;
 		c += (in_buf[in_pos + i/8] & mask) != 0?1:0;
-//		cout << "Mask = " << (int)mask << " wartosc = " << ((in_buf[in_pos + i/8] & mask) != 0?1:0) << " c = " << c << endl;
-//		cout << "c = " << c << " bits = " << bits_num << " in buf = " << (int)in_buf[count + i/8] <<  endl;
 		tmp = findCharacter(c, bits_num);
 		if(tmp != -1){
-//			cout << "Znak nr = " << out_pos << " bitow = " << bits_num << endl;
-//			cout << "char pos = " <<  (int)tmp << " " << (char)tmp << endl;
 			out_buf[out_pos++] = (uint8_t)tmp;
 			c = 0;
 			bits_num = 0;
@@ -186,7 +175,7 @@ void HuffmanCoder::encodeBuf(coderData* data){
 
 	data->out_size = out8_pos + (out16_pos) * sizeof(uint16_t) + 3 * sizeof(uint32_t);
 
-	data->var_1 = bits;//(out_pos - 2 * count - sizeof(uint32_t) * count) * 8 - bits_left;
+	data->var_1 = bits;
 
 	(reinterpret_cast<uint32_t*>(data->out_buf))[0] = data->in_size; //Remember original input size
 	(reinterpret_cast<uint32_t*>(data->out_buf))[1] = data->var_1; //Remember number of bits in output
@@ -263,10 +252,8 @@ uint32_t HuffmanCoder::generateMask(int size){
 }
 
 uint16_t HuffmanCoder::getBitsFromBuffer(uint32_t buff, int bits){
-//	cout << "Before = " << buff << " shift = " << bits - 16;
 	buff >>= (bits - 16);
 	buff &= 0xFFFF;
-//	cout << " return = " << buff << endl;
 	return (uint16_t)buff;
 
 }
@@ -323,10 +310,6 @@ void HuffmanCoder::constructTree(){
 		}
 	}
 
-
-//	for(list<Node *>::iterator it = nodes.begin(); it != nodes.end(); ++it)
-//		cout << (*it)->getWeight() << endl;
-
 	while(nodes.size() > 1){
 		nodes.sort(compareNodes);
 
@@ -342,12 +325,6 @@ void HuffmanCoder::constructTree(){
 	}
 
 	tree2arrays(nodes.front(), 0, 0, false);
-//
-//	for(int i = 0; i < alphabet_size; ++i)
-//		if(num_of_bits[i] > 0)
-//			cout << (char)i << " kod: " << alphabet_weights[i] << " ilość bitów: " << num_of_bits[i] << endl;
-
-
 }
 
 void HuffmanCoder::tree2arrays(Node *tree, int level, int num, bool right){
@@ -369,10 +346,6 @@ void HuffmanCoder::countWeights(const uint8_t* in_buf, int buf_size){
 	for(int i = 0; i < buf_size; ++i){
 		alphabet_weights[in_buf[i]]++;
 	}
-
-//	for(int i = 0; i < alphabet_size; ++i){
-//		cout << i << " count = " << alphabet_weights[i] << endl;
-//	}
 }
 
 /********************************************************/

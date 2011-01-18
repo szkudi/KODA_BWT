@@ -13,12 +13,9 @@ using namespace std;
 namespace SecondStepAlgs {
 
 RLE_2::RLE_2() {
-	// TODO Auto-generated constructor stub
-
 }
 
 RLE_2::~RLE_2() {
-	// TODO Auto-generated destructor stub
 }
 
 int RLE_2::encodeBuf(const uint8_t *in_buf, uint8_t *out_buf, int buf_size){
@@ -189,7 +186,6 @@ void RLE_2::setRLE_buffer(const uint32_t* buffer, int size){
 
 	for(int i = 0; i < size; ++i)
 		RLE_buffer.push_back(buffer[i]);
-//	RLE_buffer = vector<int> (buffer, buffer + sizeof(int) * size);
 }
 
 }

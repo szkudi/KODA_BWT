@@ -22,24 +22,18 @@ DC::~DC() {
 }
 
 int DC::encodeBuf(const uint8_t* in_buf, uint32_t* out_buf, int buf_size){
-
-//	out_buf = new uint8_t[buf_size];
-//	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
 	int count = 0;
 	int out_pos = buf_size + 1;
 
 	init();
 
 	for(int i = 0; i < buf_size; ++i){
-//		cout << i << " " << in_buf[i];
-//		printf(" %d\n", num_elem[in_buf[i]]);
 		if(start_pos[in_buf[i]] == -1){
 			start_pos[in_buf[i]] = i;
 			last_pos[in_buf[i]] = i;
 			out_buf[i] = 0;
 		}
 		else {
-//			cout << actual_dist[in_buf[i]] << " " << in_buf[i] << endl;
 			out_buf[last_pos[in_buf[i]]] = i - last_pos[in_buf[i]];
 			last_pos[in_buf[i]] = i;
 			out_buf[i] = 0;
@@ -62,8 +56,6 @@ void DC::decodeBuf(const uint32_t* in_buf, uint8_t* out_buf, int buf_size){
 
 	int j;
 	int tmp;
-//	out_buf = new uint8_t[buf_size];
-//	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
 
 	init();
 
@@ -77,7 +69,6 @@ void DC::decodeBuf(const uint32_t* in_buf, uint8_t* out_buf, int buf_size){
 
 	for(int i = 0; i < alphabet_size; ++i){
 		if((j = start_pos[i]) >= 0){
-//			cout << i <<  " " << j << endl;
 			while(in_buf[j] != 0){
 				tmp = in_buf[j];
 				out_buf[j] = i;
@@ -107,7 +98,6 @@ void DC::encodeBuf(coderData* data){
 			out[i] = 0;
 		}
 		else {
-//			cout << actual_dist[in_buf[i]] << " " << in_buf[i] << endl;
 			out[last_pos[data->in_buf[i]]] = i - last_pos[data->in_buf[i]];
 			last_pos[data->in_buf[i]] = i;
 			out[i] = 0;
@@ -132,8 +122,6 @@ void DC::decodeBuf(coderData* data){
 
 	int j;
 	int tmp;
-//	out_buf = new uint8_t[buf_size];
-//	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
 
 	init();
 
@@ -152,7 +140,6 @@ void DC::decodeBuf(coderData* data){
 
 	for(int i = 0; i < alphabet_size; ++i){
 		if((j = start_pos[i]) >= 0){
-//			cout << i <<  " " << j << endl;
 			while(in[j] != 0){
 				tmp = in[j];
 				data->out_buf[j] = i;

@@ -24,7 +24,6 @@
 #include "second_step/IFC.h"
 #include "second_step/RLE.h"
 #include "second_step/HuffmanCoder.h"
-#include "second_step/ArthmeticCoder.h"
 
 using namespace std;
 const static int alphabet_size = 256;
@@ -288,8 +287,8 @@ int main(int argc, char** argv) {
 
 		cd.in_size = size2;
 
-//		cd.in_buf = buf_1;
-//		cd.in_size = data_size;
+		cd.in_buf = buf_1;
+		cd.in_size = data_size;
 
 		switch(alg_type){
 			case 1:
@@ -299,7 +298,7 @@ int main(int argc, char** argv) {
 				runs_size = rle2->getSizeRLE_buffer();
 				runs = rle2->getRLE_buffer();
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -316,28 +315,28 @@ int main(int argc, char** argv) {
 				cd.out_buf = tmp;
 				cd.out_size = (runs_size + 2) * sizeof(uint32_t)  + cd.out_size;
 
-//				delete[] runs;
+				delete[] runs;
 
 				break;
 			case 2:
 				// "RLE-0 + IFC + Huffman Coding"
 				rle->encodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
 				ifc->encodeBuf(&cd);
 				break;
 			case 3:
-				// "IFC + Huffman Coding"
+				 //"IFC + Huffman Coding"
 				ifc->encodeBuf(&cd);
 				break;
 			case 4:
 				// "DC + RLE + Huffman Coding";
 				dc->encodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -351,7 +350,7 @@ int main(int argc, char** argv) {
 				// "IF + RLE + Huffman Coding"
 				invfreq->encodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -365,7 +364,7 @@ int main(int argc, char** argv) {
 				// "MTF + RLE + Huffman Coding"
 				mtf->encodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -377,7 +376,7 @@ int main(int argc, char** argv) {
 				break;
 		}
 
-//		delete[] cd.in_buf;
+		delete[] cd.in_buf;
 		cd.in_buf = cd.out_buf;
 		cd.in_size = cd.out_size;
 
@@ -385,11 +384,11 @@ int main(int argc, char** argv) {
 
 		output.write((char*)cd.out_buf, cd.out_size);
 
-//		delete[] cd.in_buf;
-//		cd.in_buf = NULL;
-//		delete[] cd.out_buf;
-//		cd.out_buf = NULL;
-//		delete[] buf_1;
+		delete[] cd.in_buf;
+		cd.in_buf = NULL;
+		delete[] cd.out_buf;
+		cd.out_buf = NULL;
+		delete[] buf_1;
 	}
 
 	if(decoding){
@@ -403,7 +402,7 @@ int main(int argc, char** argv) {
 
 		hc.decodeBuf(&cd);
 
-//		delete[] cd.in_buf;
+		delete[] cd.in_buf;
 		cd.in_buf = cd.out_buf;
 		cd.in_size = cd.out_size;
 
@@ -423,18 +422,20 @@ int main(int argc, char** argv) {
 
 				ifc->decodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
 				rle2->setRLE_buffer(runs, runs_size);
 				rle2->decodeBuf(&cd);
+
+				delete[] runs;
 				break;
 			case 2:
 				// "RLE-0 + IFC + Huffman Coding"
 				ifc->decodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -448,7 +449,7 @@ int main(int argc, char** argv) {
 				// "DC + RLE + Huffman Coding";
 				rle->decodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -462,7 +463,7 @@ int main(int argc, char** argv) {
 				// "IF + RLE + Huffman Coding"
 				rle->decodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -476,7 +477,7 @@ int main(int argc, char** argv) {
 				// "MTF + RLE + Huffman Coding"
 				rle->decodeBuf(&cd);
 
-//				delete[] cd.in_buf;
+				delete[] cd.in_buf;
 				cd.in_buf = cd.out_buf;
 				cd.in_size = cd.out_size;
 
@@ -503,11 +504,9 @@ int main(int argc, char** argv) {
 
 		output.write((char*)buf_2, size2);
 
-//		output.write((char*)cd.out_buf, cd.out_size);
-
-//		delete[] cd.in_buf;
-//		delete[] cd.out_buf;
-//		delete[] buf_2;
+		delete[] cd.in_buf;
+		delete[] cd.out_buf;
+		delete[] buf_2;
 	}
 
 	return EXIT_SUCCESS;

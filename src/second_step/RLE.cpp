@@ -60,7 +60,6 @@ void RLE::encodeBuf(coderData* data){
 	uint8_t counter = 1;
 	uint8_t c = data->in_buf[0];
 	int out_pos = 0;
-//	int sum = 0;
 
 	data->out_buf = new uint8_t[2 * data->in_size + 2 * sizeof(uint32_t)];
 
@@ -71,8 +70,6 @@ void RLE::encodeBuf(coderData* data){
 			counter++;
 		else {
 			out[out_pos++] = counter;
-//			cout << i << " count " << (int)counter << " znak = " << (int)c << endl;
-//			sum += counter;
 			out[out_pos++] = c;
 			counter = 1;
 			c = data->in_buf[i];
@@ -85,7 +82,6 @@ void RLE::encodeBuf(coderData* data){
 	(reinterpret_cast<uint32_t*>(data->out_buf))[0] = out_pos;
 	(reinterpret_cast<uint32_t*>(data->out_buf))[1] = data->in_size;
 
-//	cout << "In = " << data->in_size << " out = " << out_pos << " all = " << sum << endl;
 }
 
 void RLE::decodeBuf(coderData* data){
@@ -102,7 +98,6 @@ void RLE::decodeBuf(coderData* data){
 
 	for(int i = 0; i < data->var_1; i+=2){
 		cnt = in[i];
-//		cout << i << " " << out_pos << " count " << (int)cnt << " znak = " << (int)in[i + 1] << endl;
 		while(cnt--){
 			data->out_buf[out_pos++] = in[i + 1];
 		}

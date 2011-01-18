@@ -26,14 +26,6 @@ int IF::encodeBuf(const uint8_t *in_buf, uint32_t *out_buf, int buf_size){
 	init();
 
 	for(int i = 0; i < buf_size; ++i){
-//		if(!num_elem[in_buf[i]]++){
-//			ret_value[in_buf[i]].push_back(i);
-////			cout << i << " znak = " << in_buf[i] << endl;
-//			modifyTempElements(in_buf[i]);
-//		}else {
-//			ret_value[in_buf[i]].push_back(actual_dist[in_buf[i]]);
-//			modifyTempElements(in_buf[i]);
-//		}
 		if(num_elem[in_buf[i]] == 0)
 			ret_value[in_buf[i]].push_back(i);
 		else
@@ -89,17 +81,13 @@ void IF::decodeBuf(const uint32_t *in_buf, uint8_t *out_buf, int buf_size){
 	memset(out_buf, 255, sizeof(uint8_t) * buf_size);
 
 
-//	cout << "Begin " <<  in << endl;
 	for(int i = 0; i < alphabet_size; ++i){ //for each alphabet symbol
 		if(num_elem[i] > 0){
-//			cout << i << " " << in << " num = " << num_elem[i] <<  endl;
 			out = in_buf[in];
 			cout << "znak = " << (char)i << endl << out << " ";
-//			cout << out << endl;
 			out_buf[out++] = i;
 			for(int j = 1; j < num_elem[i]; ++j){ //for each occurrence of that symbol
 				tmp = in_buf[in + j];
-//				cout << tmp << " ";
 				if(tmp == 0){
 					while(out_buf[out] < i)
 						out++;
@@ -111,7 +99,6 @@ void IF::decodeBuf(const uint32_t *in_buf, uint8_t *out_buf, int buf_size){
 				}
 				out_buf[out++] = i;
 			}
-//			cout << endl;
 			in += num_elem[i];
 		}
 	}

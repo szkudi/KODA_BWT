@@ -6,7 +6,6 @@
  */
 
 #include "MTF.h"
-//#include <stdint.h>
 #include <cstring>
 #include <iostream>
 
@@ -14,7 +13,7 @@ namespace SecondStepAlgs {
 
 using namespace std;
 
-MTF::MTF(){//:SecondStepAlg() {
+MTF::MTF(){
 
 
 }
@@ -31,12 +30,6 @@ void MTF::init(){
 void MTF::encodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size){
 
 	init();
-//	cout << "Init" << endl;
-//	out_buf = new uint8_t[buf_size];
-//	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
-
-//	cout << "Start konwersji" << endl;
-
     for (int i = 0; i < buf_size; ++i) {
         out_buf[i] = alphabet[in_buf[i]];
         for (int j = 0; j < alphabet_size; ++j)
@@ -49,8 +42,6 @@ void MTF::encodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size){
 void MTF::decodeBuf(const uint8_t* in_buf, uint8_t* out_buf, int buf_size){
 
     uint8_t tmp;
-//	out_buf = new uint8_t[buf_size];
-//	memset(out_buf, 0, sizeof(uint8_t) * buf_size);
 
     init();
 
